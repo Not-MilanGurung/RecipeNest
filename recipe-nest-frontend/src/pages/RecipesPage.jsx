@@ -1,7 +1,11 @@
+import NavBar from "../components/NavBar"
 
 function RecipesPage() {
   return (
-	<div>RecipesPage</div>
+	<div>
+		<NavBar />
+		<div>RecipesPage</div>
+	</div>
   )
 }
 
