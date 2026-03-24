@@ -29,7 +29,7 @@ const register = async (data) => {
 		refreshToken,
 		success: true,
 		message: 'User registerd successfully',
-		data: { user: user, tokens: { accessToken }}
+		data: { user: user, accessToken}
 	};
 }
 
@@ -62,7 +62,7 @@ const login = async (email, password) => {
 		refreshToken,
 		success: true,
 		message: 'Login succesfull',
-		data: { data, tokens: { accessToken}}
+		data: { user: data, accessToken}
 	};
 }
 
@@ -81,7 +81,7 @@ const refreshToken = async (refreshToken) => {
 	return {
 		success: true,
 		message: 'Access token generated successfully',
-		data: { accessToken }
+		data: { user, accessToken }
 	};
 }
 

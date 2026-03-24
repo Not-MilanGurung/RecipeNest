@@ -1,7 +1,9 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import { useForm } from 'react-hook-form';
 import { apiLoginRoute } from "../constants";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../helpers/contexts";
+import api from "../helpers/api";
 
 function LoginPage() {
 	const {register, handleSubmit,  formState: {errors}} = useForm({mode: 'onChange'});
@@ -10,32 +12,25 @@ function LoginPage() {
 			message: ""
 		});
 	const navigate = useNavigate();
+	const userContext = useContext(UserContext);
 
 	const onSubmit = async (e) => {
 		try{
 			setSubmitStatus({ success: false, message: ''});
 			const data = JSON.stringify(e);
-			
-			const response = await fetch(apiLoginRoute.url, {
-				method: apiLoginRoute.method,
-				body: data,
+			const response = await api.post(apiLoginRoute, data, {
 				headers: {
-					"Content-Type": "application/json"
-				},
-				credentials: 'same-origin'
+					'Content-Type' : 'application/json'
+				}
 			});
-			console.log(response);
-			if(response.ok){
-				setSubmitStatus({ success: true, message: "Login Successfull. Redirecting to home page" });
-				setTimeout(() => navigate("/"), 500);
-			} else {
-				const result = await response.json();
-				setSubmitStatus({ success: false, message: result.message});
-			}	
+
+			userContext.setData({user: response.data.data.user, accessToken: response.data.data.accessToken});
+			setSubmitStatus({ success: true, message: "Login Successfull. Redirecting to home page" });
+			setTimeout(() => navigate("/"), 500);
 
 		} catch(error) {
-			console.error(error);
-			setSubmitStatus({ success: false, message: "Network error. Please try again later" });
+			const errorMessage = error.response?.data?.message || "An error occurred during login";
+			setSubmitStatus({ success: false, message: errorMessage });
 		}
 	}
 

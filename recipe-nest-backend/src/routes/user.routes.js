@@ -9,7 +9,7 @@ const userController = require('../controllers/user.controller');
 // Public routes
 router.post('/register', userController.register);
 router.post('/login', userController.login);
-router.post('/refresh', userController.refreshToken);
+router.get('/refresh', userController.refreshToken);
 
 // Protected routes
 router.get('/profile', authOnly, userController.getProfile);

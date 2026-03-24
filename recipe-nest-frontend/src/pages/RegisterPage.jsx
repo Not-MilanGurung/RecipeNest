@@ -1,7 +1,9 @@
 import { useForm, useWatch } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router';
 import { apiRegisterRoute } from '../constants';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { UserContext } from '../helpers/contexts';
+import api from '../helpers/api';
 
 
 function RegisterPage() {
@@ -16,28 +18,25 @@ function RegisterPage() {
 	});
 	// const passwordRegex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}";
 	const navigate = useNavigate();
+	const userContext = useContext(UserContext);
+
 	const onSubmit = async (e) => {
 		try{
 			setSubmitStatus({ success: false, message: ''});
 			const data = JSON.stringify(e);
-			const response = await fetch(apiRegisterRoute.url, {
-				method: apiRegisterRoute.method,
-				body: data,
+			const response = await api.post(apiRegisterRoute, data, {
 				headers: {
-					"Content-Type": "application/json"
-				} 
+					'Content-Type': 'application/json'
+				}
 			});
 			
-			if(response.ok){
-				setSubmitStatus({ success: true, message: "Successfully created an account. Now navigating to login page" });
-				setTimeout(() => navigate("/login"), 500);
-			} else {
-				const result = await response.json();
-				setSubmitStatus({ success: false, message: result.message});
-			}		
+			userContext.setData({user: response.data.data.user, accessToken: response.data.data.accessToken});
+			setSubmitStatus({ success: true, message: "Successfully created an account." });
+			setTimeout(() => navigate("/"), 500);
+
 		} catch (error) {
-			console.error(error);
-			setSubmitStatus({ success: false, message: "Network error. Please try again"});
+			const errorMessage = error.response?.data?.message || "Network error. Please try again";
+			setSubmitStatus({ success: false, message: errorMessage});
 		}
 	}
 
