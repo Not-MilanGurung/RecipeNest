@@ -1,12 +1,42 @@
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { useForm } from 'react-hook-form';
+import { apiLoginRoute } from "../constants";
+import { useState } from "react";
 
 function LoginPage() {
-	const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onChange'});
+	const {register, handleSubmit,  formState: {errors}} = useForm({mode: 'onChange'});
+	const [submitStatus, setSubmitStatus] = useState({
+			success: false,
+			message: ""
+		});
+	const navigate = useNavigate();
 
+	const onSubmit = async (e) => {
+		try{
+			setSubmitStatus({ success: false, message: ''});
+			const data = JSON.stringify(e);
+			
+			const response = await fetch(apiLoginRoute.url, {
+				method: apiLoginRoute.method,
+				body: data,
+				headers: {
+					"Content-Type": "application/json"
+				},
+				credentials: 'same-origin'
+			});
+			console.log(response);
+			if(response.ok){
+				setSubmitStatus({ success: true, message: "Login Successfull. Redirecting to home page" });
+				setTimeout(() => navigate("/"), 500);
+			} else {
+				const result = await response.json();
+				setSubmitStatus({ success: false, message: result.message});
+			}	
 
-	const onSubmit = (e) => {
-		console.log(e);
+		} catch(error) {
+			console.error(error);
+			setSubmitStatus({ success: false, message: "Network error. Please try again later" });
+		}
 	}
 
 	return (
@@ -16,10 +46,17 @@ function LoginPage() {
 				<div className="text-7xl font-bold pr-20">A community to share culinary recipes</div>
 			</div>
 			{/* Form */}
-			<form onSubmit={handleSubmit(onSubmit)} 
+			<form onSubmit={handleSubmit(onSubmit)}  
 				className="flex-row w-4/10 h-full content-center justify-center bg-secondary  px-35 py-10 space-y-4 text-neutral">
 				{/* Form Title */}
 				<div className="text-3xl text-neutral font-semibold">Welcome Back</div>
+
+				{/* Submit message */}
+				{submitStatus.message && (
+					<div className={`p-3 mb-4 rounded ${submitStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+						{submitStatus.message}
+					</div>
+				)}
 
 				{/* Email Field */}
 				<div>
@@ -57,8 +94,7 @@ function LoginPage() {
 									if (value.length < 8) return "Must be at least 8 characters long";
 									let output = 'Must contain: ';
 									
-									console.log(output);
-									return output === '' || output;
+									return output === 'Must contain: ' || output;
 								}
 							})}
 							/>

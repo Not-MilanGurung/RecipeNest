@@ -20,6 +20,8 @@ const register = async (data) => {
 	});
 
 	await newUser.save();
+	const user = newUser.toJSON();
+	delete user.password;
 	const accessToken = newUser.generateAccessToken();
 	const refreshToken = newUser.generateRefreshToken();
 
@@ -27,7 +29,7 @@ const register = async (data) => {
 		refreshToken,
 		success: true,
 		message: 'User registerd successfully',
-		data: { user: newUser, tokens: { accessToken }}
+		data: { user: user, tokens: { accessToken }}
 	};
 }
 
@@ -51,7 +53,8 @@ const login = async (email, password) => {
 		throw error;
 	}
 
-	delete user.password;
+	const data = user.toJSON();
+	delete data.password;
 	const accessToken = user.generateAccessToken();
 	const refreshToken = user.generateRefreshToken();
 
@@ -59,7 +62,7 @@ const login = async (email, password) => {
 		refreshToken,
 		success: true,
 		message: 'Login succesfull',
-		data: { user, tokens: { accessToken}}
+		data: { data, tokens: { accessToken}}
 	};
 }
 
@@ -123,7 +126,7 @@ const uploadAvatar = async (fileBuffer, userId) => {
 			}
 		).end(fileBuffer);
 	});
-	console.log(result);
+	
 	
 	user.avatar = result.secure_url;
 	await user.save();

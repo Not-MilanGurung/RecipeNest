@@ -1,18 +1,44 @@
 import { useForm, useWatch } from 'react-hook-form';
-import { NavLink } from 'react-router';
-
+import { NavLink, useNavigate } from 'react-router';
+import { apiRegisterRoute } from '../constants';
+import { useState } from 'react';
 
 
 function RegisterPage() {
 	const { register, handleSubmit, formState: { errors }, control } = useForm({mode: 'onChange'});
+	const [submitStatus, setSubmitStatus] = useState({
+		success: false,
+		message: ""
+	});
 	const password = useWatch({
 		control,
 		name: 'password'
 	});
 	// const passwordRegex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}";
-
-	const onSubmit = (e) => {
-		console.log(e);
+	const navigate = useNavigate();
+	const onSubmit = async (e) => {
+		try{
+			setSubmitStatus({ success: false, message: ''});
+			const data = JSON.stringify(e);
+			const response = await fetch(apiRegisterRoute.url, {
+				method: apiRegisterRoute.method,
+				body: data,
+				headers: {
+					"Content-Type": "application/json"
+				} 
+			});
+			
+			if(response.ok){
+				setSubmitStatus({ success: true, message: "Successfully created an account. Now navigating to login page" });
+				setTimeout(() => navigate("/login"), 500);
+			} else {
+				const result = await response.json();
+				setSubmitStatus({ success: false, message: result.message});
+			}		
+		} catch (error) {
+			console.error(error);
+			setSubmitStatus({ success: false, message: "Network error. Please try again"});
+		}
 	}
 
 	return (
@@ -23,13 +49,19 @@ function RegisterPage() {
 				{/* Form Title */}
 				<div className="text-3xl text-neutral font-semibold">Register</div>
 
+				{submitStatus.message && (
+					<div className={`p-3 mb-4 rounded ${submitStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+						{submitStatus.message}
+					</div>
+				)}
+
 				{/* Username Field */}
 				<div>
 					<label>
 						Username
-						<input type="username" name="username" 
+						<input type="text" name="name" 
 							className="w-full h-10 bg-neutral/5 py-2 px-2"
-							{...register('username', {
+							{...register('name', {
 								required: 'Username is required',
 							})}
 							/>
@@ -56,7 +88,7 @@ function RegisterPage() {
 							/>
 						<br />
 						{errors.email && (
-							<span className='error-message'>{errors.email.message}</span>
+							<span className='error-message text-red-600'>{errors.email.message}</span>
 						)}
 					</label>
 				</div>
@@ -83,8 +115,7 @@ function RegisterPage() {
 									const doesNotContainNumbers = !value.match(/[0-9]/g);
 									if (doesNotContainNumbers) output += " number (0-9), ";
 									
-									console.log(output);
-									return output === '' || output;
+									return output === 'Must contain: ' || output;
 								}
 							})}
 							/>

@@ -5,9 +5,11 @@ const app = express();
 require('./src/configs/database');
 
 const { PORT } = require('./src/configs/config');
+const cors = require('./src/middlewares/cors.middleware');
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors);
 
 const userRoutes = require('./src/routes/user.routes');
 
