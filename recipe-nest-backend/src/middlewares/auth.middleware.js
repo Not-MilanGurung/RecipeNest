@@ -38,7 +38,18 @@ const adminOnly = (req, res, next) => {
   }
 };
 
+const chefOnly = (req, res, next) => {
+	if (req.user && req.user.role === userRoles.values.CHEF) {
+		next();
+	} else {
+		const error = new Error("Not authorized, Chef access required.");
+		error.statusCode = 403;
+		throw error;
+	}
+}
+
 module.exports = {
 	authOnly,
-	adminOnly
+	adminOnly,
+	chefOnly
 }

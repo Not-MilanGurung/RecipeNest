@@ -1,6 +1,6 @@
 import { useForm, useWatch } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router';
-import { apiRegisterRoute } from '../constants';
+import { apiRegisterRoute } from '../helpers/constants';
 import { useContext, useState } from 'react';
 import { UserContext } from '../helpers/contexts';
 import api from '../helpers/api';

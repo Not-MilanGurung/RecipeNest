@@ -10,9 +10,11 @@ const corsOptions = {
 		// if (!origin) return callback(null, true);
 		
 		if (allowedOrigins.indexOf(origin) !== -1) {
-		callback(null, true);
+			callback(null, true);
 		} else {
-		callback(new Error('Not allowed by CORS'));
+			const error = new Error('Not allowed by CORS');
+			error.statusCode = 403;
+			callback(error);
 		}
 	},
 	credentials:true,

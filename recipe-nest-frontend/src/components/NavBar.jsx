@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router';
 import { useContext } from 'react';
 import { UserContext } from '../helpers/contexts'; // Adjust path as needed
+import { apiLogoutRoute } from '../helpers/constants';
+import api from '../helpers/api';
 
 function NavBar() {
     const { data, setData } = useContext(UserContext);
@@ -10,7 +12,8 @@ function NavBar() {
         ${isActive ? `text-primary underline underline-offset-10` : `hover:underline underline-offset-10`}
     `;
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+		await api.get(apiLogoutRoute);
         // Clear local state
         setData(null);
         // Optionally: Call your backend /logout endpoint to clear the HttpOnly cookie
@@ -50,17 +53,17 @@ function NavBar() {
 
 						<button 
 							onClick={handleLogout}
-							className='text-primary border border-primary rounded-md px-4 py-1 hover:bg-primary cursor-pointer hover:text-white transition-all'
+							className='text-primary border border-primary rounded-md px-4 py-1 hover:bg-primary cursor-pointer hover:text-secondary transition-all'
 						>
 							Logout
 						</button>
 					</div>
                 ) : (
                     <>
-                        <NavLink to="/login" className='text-primary rounded-md px-4 py-1 cursor-pointer hover:bg-primary hover:text-white'>
+                        <NavLink to="/login" className='text-primary border border-primary rounded-md px-4 py-1 cursor-pointer hover:bg-primary hover:text-white'>
                             Login
                         </NavLink>
-                        <NavLink to="/register" className='bg-primary text-secondary rounded-md px-4 py-1 cursor-pointer hover:bg-primary/75'>
+                        <NavLink to="/register" className='bg-primary text-secondary rounded-md px-4 py-1 cursor-pointer hover:bg-primary/80'>
                             Register
                         </NavLink>
                     </>

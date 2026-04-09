@@ -82,10 +82,19 @@ const uploadAvatar = async (req, res) => {
 
 }
 
+const logout = async (req, res) => {
+	res.clearCookie('jwt', { httpOnly: true });
+	res.status(200).json({
+		success: true,
+		message: "Logged out successfully"
+	});
+}
+
 module.exports = {
 	register,
 	login,
 	getProfile,
 	refreshToken,
-	uploadAvatar
+	uploadAvatar,
+	logout
 }

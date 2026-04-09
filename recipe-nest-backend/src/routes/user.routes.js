@@ -10,6 +10,7 @@ const userController = require('../controllers/user.controller');
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/refresh', userController.refreshToken);
+router.get('/logout', userController.logout);
 
 // Protected routes
 router.get('/profile', authOnly, userController.getProfile);
