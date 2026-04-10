@@ -12,8 +12,10 @@ app.use(cookieParser());
 app.use(cors);
 
 const userRoutes = require('./src/routes/user.routes');
+const recipeRoutes = require('./src/routes/recipe.routes');
 
 app.use('/users', userRoutes);
+app.use('/recipes', recipeRoutes);
 
 const errorHandler = require('./src/middlewares/error-handler.middleware');
 app.use(errorHandler);

@@ -1,0 +1,60 @@
+const recipeService = require('../services/recipe.service');
+
+const getRecipes = async (req, res) => {
+	const { page = 1, limit = 25, sort = { createdAt: -1}, filter } = req.query;
+	
+	const result = await recipeService.get(page, limit, sort, filter);
+	res.status(200).json(result);
+}
+
+const getRecipeById = async (req, res) => {
+	const { id } = req.params;
+
+	const result = await recipeService.getById(id);
+	res.status(200).json(result);
+}
+
+const createRecipe = async (req, res) => {
+	const data = req.body;
+	if (!data) {
+		const error = new Error('No body provided');
+		error.statusCode = 400;
+		throw error;
+	}
+	const imageBuffer = req.file.buffer;
+	const userId = req.user.id;
+	
+	const result = await recipeService.create(userId, data, imageBuffer);
+	res.status(201).json(result);
+}
+
+const updateRecipe = async (req, res) => {
+	const { id } = req.params;
+	const data = req.body;
+	if (!data) {
+		const error = new Error('No body provided');
+		error.statusCode = 400;
+		throw error;
+	}
+	const imageBuffer = req.file.buffer;
+	const userId = req.user.id;
+
+	const result = await recipeService.updateById(id, userId, data, imageBuffer);
+	res.status(200).json(result);
+}
+
+const deleteRecipe = async (req, res) => {
+	const userId = req.user.id;
+	const {id} = req.params;
+
+	const result = await recipeService.deleteById(userId, id);
+	res.status(200).json(result);
+}
+
+module.exports = {
+	getRecipes,
+	getRecipeById,
+	createRecipe,
+	updateRecipe,
+	deleteRecipe
+}

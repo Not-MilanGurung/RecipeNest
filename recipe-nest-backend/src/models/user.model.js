@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN } = require('../configs/config');
+const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN, parseExpiresInToMilliSeconds } = require('../configs/config');
 
 const userRoles = Object.freeze({
 	values: {
@@ -104,7 +104,7 @@ userSchema.methods.generateRefreshToken = function () {
 		config: {
 			httpOnly: true,
 			sameSite: 'None', secure: true,
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: parseExpiresInToMilliSeconds(JWT_REFRESH_EXPIRES_IN)
 		}
 	};
 }

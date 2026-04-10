@@ -82,10 +82,33 @@ const uploadAvatar = async (req, res) => {
 
 }
 
+const updateProfile = async (req, res) => {
+	const userId = req.user.id;
+	const data = req.body;
+	if (!data) {
+		const error = new Error('No body provided');
+		error.statusCode = 400;
+		throw error;
+	}
+
+	const result = await userServices.updateProfile(userId, data);
+	res.status(200).json(result);
+}
+
+const logout = async (req, res) => {
+	res.clearCookie('jwt', { httpOnly: true });
+	res.status(200).json({
+		success: true,
+		message: "Logged out successfully"
+	});
+}
+
 module.exports = {
 	register,
 	login,
 	getProfile,
 	refreshToken,
-	uploadAvatar
+	uploadAvatar,
+	logout,
+	updateProfile
 }

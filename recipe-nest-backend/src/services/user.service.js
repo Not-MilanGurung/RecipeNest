@@ -100,11 +100,41 @@ const getProfile = async (userId) => {
 	};
 }
 
+const updateProfile = async (userId, data) => {
+	const user = await User.findById(userId);
+	if (!user) {
+		const error = new Error('User not found');
+		error.statusCode = 404;
+		throw error;
+	}
+
+	const allowedUpdates = ['name', 'email', 'phone'];
+	const filteredData = {};
+	for (const key of allowedUpdates) {
+		if (data[key] !== undefined) {
+			filteredData[key] = data[key];
+		}
+	}
+
+	const updated = await User.findByIdAndUpdate(user._id, filteredData, {
+		returnDocument: 'after',
+		runValidators: true
+	});
+
+	return {
+		success: true,
+		message: 'Profile updated successfully',
+		data: {
+			updated
+		}
+	}
+}
+
 const uploadAvatar = async (fileBuffer, userId) => {
 	const user = await User.findById(userId);
 	if (!user) {
 		const error = new Error('User not found');
-		error.statusCode = 401;
+		error.statusCode = 404;
 		throw error;
 	}
 	const result = await new Promise( (resolve, reject) => {
@@ -145,5 +175,6 @@ module.exports = {
 	login,
 	getProfile,
 	refreshToken,
-	uploadAvatar
+	uploadAvatar,
+	updateProfile
 }
