@@ -14,11 +14,21 @@ const recipeSchema = new mongoose.Schema(
 		},
 		steps: {
 			type: [String],
-			required: [true, "Please provied the steps"]
+			validate: {
+				validator: function(v) {
+					return v.length >= 1 && v.length <= 100;
+				},
+				message: "Steps list must be between 1 to 100 "
+			}
 		},
 		ingredients: {
 			type: [{ type:String, maxlength: [50, 'An ingredient can not be more than 50 characters'] }],
-			required: [true, 'Please provide ingredients list']
+			validate: {
+				validator: function(v) {
+					return v.length >= 1 && v.length <= 100;
+				},
+				message: "Ingredients list must be between 1 to 100 "
+			}
 		},
 		utensils: {
 			type: [{

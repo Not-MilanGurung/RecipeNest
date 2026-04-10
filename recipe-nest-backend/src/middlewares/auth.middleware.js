@@ -39,7 +39,7 @@ const adminOnly = (req, res, next) => {
 };
 
 const chefOnly = (req, res, next) => {
-	if (req.user && req.user.role === userRoles.values.CHEF) {
+	if (req.user && (req.user.role === userRoles.values.CHEF || req.user.role === userRoles.values.ADMIN)) {
 		next();
 	} else {
 		const error = new Error("Not authorized, Chef access required.");

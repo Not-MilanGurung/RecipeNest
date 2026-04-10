@@ -15,6 +15,7 @@ router.get('/logout', userController.logout);
 // Protected routes
 router.get('/profile', authOnly, userController.getProfile);
 router.put('/profile/pic', authOnly, multer.single('avatar'), userController.uploadAvatar);
+router.put('/profile', authOnly, userController.updateProfile);
 
 
 module.exports = router;
