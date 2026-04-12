@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const { DB_URL } = require('./config');
 
-mongoose.connect(DB_URL);
+mongoose.connect(DB_URL, 
+	{ dbName: 'recipe-nest'}
+);
 
 const database = mongoose.connection;
 
