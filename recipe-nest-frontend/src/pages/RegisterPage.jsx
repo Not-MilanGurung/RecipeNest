@@ -1,9 +1,10 @@
 import { useForm, useWatch } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router';
-import { apiRegisterRoute } from '../helpers/constants';
+import { apiRegisterRoute, roles } from '../helpers/constants';
 import { useContext, useState } from 'react';
 import { UserContext } from '../helpers/contexts';
 import api from '../helpers/api';
+
 
 
 function RegisterPage() {
@@ -71,6 +72,20 @@ function RegisterPage() {
 					</label>
 				</div>
 				{/* Username Field End */}
+				
+				{/* Role Field */}
+				<div>
+					<label>Role
+						<select name='role' defaultValue={roles.FOODIE}
+							className="w-full h-10 bg-neutral/5 py-2 px-2"
+							{...register('role', {
+								required: 'Role is required'
+							})}>
+							<option value={roles.FOODIE}>Foodie</option>	
+							<option value={roles.CHEF}>Chef</option>	
+						</select>
+					</label>
+				</div>
 
 				{/* Email Field */}
 				<div>

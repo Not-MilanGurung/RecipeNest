@@ -21,10 +21,17 @@ const createRecipe = async (req, res) => {
 		error.statusCode = 400;
 		throw error;
 	}
-	const imageBuffer = req.file.buffer;
+
+	const recipeData = {
+		...req.body,
+		metrics: JSON.parse(req.body.metrics),
+		ingredients: JSON.parse(req.body.ingredients),
+		steps: JSON.parse(req.body.steps)
+	}
+	const imageBuffer = req.file?.buffer;
 	const userId = req.user.id;
 	
-	const result = await recipeService.create(userId, data, imageBuffer);
+	const result = await recipeService.create(userId, recipeData, imageBuffer);
 	res.status(201).json(result);
 }
 
@@ -36,10 +43,18 @@ const updateRecipe = async (req, res) => {
 		error.statusCode = 400;
 		throw error;
 	}
+
+	const recipeData = {
+		...req.body,
+		metrics: JSON.parse(req.body.metrics),
+		ingredients: JSON.parse(req.body.ingredients),
+		steps: JSON.parse(req.body.steps)
+	}
+
 	const imageBuffer = req.file.buffer;
 	const userId = req.user.id;
 
-	const result = await recipeService.updateById(id, userId, data, imageBuffer);
+	const result = await recipeService.updateById(id, userId, recipeData, imageBuffer);
 	res.status(200).json(result);
 }
 

@@ -1,9 +1,15 @@
 @import 'tailwindcss';
 
+/* tailwind.css or global.css */
 @theme {
-	--color-primary: oklch(0.5603 0.0961 211.75);
-	--color-secondary: oklch(0.961 0.0099 212.52);
-	--color-neutral: oklch(0.2178 0 0);  
+    --color-primary: oklch(0.5603 0.0961 211.75);   /* Professional Blue-Teal */
+    --color-secondary: oklch(0.961 0.0099 212.52);  /* Crisp, airy background/accent */
+    --color-neutral: oklch(0.2178 0 0);             /* Deep charcoal for text/depth */
+    
+    /* Expanded logical colors based on your palette */
+    --color-primary-muted: oklch(0.5603 0.0961 211.75 / 0.1);
+    --color-surface: oklch(0.98 0.005 212);         /* Ultra-light surface color */
+    --color-border: oklch(0.85 0.01 212);           /* Subtle borders */
 }
 
 :root{
