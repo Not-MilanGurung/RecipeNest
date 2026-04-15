@@ -13,4 +13,5 @@ export const roles = {
 	CHEF: 'chef',
 }
 
-export const apiRecipeCreateRoute = `/recipes/`
+export const apiRecipeCreateRoute = `/recipes/`;
+export const apiGetRecipes = '/recipes';
