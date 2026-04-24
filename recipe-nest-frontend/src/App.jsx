@@ -3,6 +3,7 @@ import AppRoute from "./routes/AppRoute";
 import { useEffect, useState } from "react";
 import { UserContext } from "./helpers/contexts";
 import api from "./helpers/api";
+import RecipeRoutes from "./routes/RecipeRoutes";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
 		<UserContext value={userContextVal}>
 			<BrowserRouter>
 				<AppRoute />
+				<RecipeRoutes />
 			</BrowserRouter>
 		</UserContext>
 	)

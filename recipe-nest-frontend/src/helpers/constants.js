@@ -15,3 +15,4 @@ export const roles = {
 
 export const apiRecipeCreateRoute = `/recipes/`;
 export const apiGetRecipes = '/recipes';
+export const apiGetRecipeById = (id) => `/recipes/${id}`;

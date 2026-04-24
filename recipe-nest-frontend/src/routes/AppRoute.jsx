@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router"
 
 import HomePage from "../pages/HomePage";
 import RecipesPage from "../pages/recipe-pages/RecipesPage";
-import ChefsPage from "../pages/ChefsPage";
+import ChefsPage from "../pages/chef-pages/ChefsPage";
 import ContactPage from "../pages/ContactPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -13,14 +13,12 @@ function AppRoute() {
   return (
 	<Routes>
 		<Route path="/" element={<HomePage />} />
-		<Route path="/recipes" element={<RecipesPage />} />
 		<Route path="/chefs" element={<ChefsPage />} />
 		<Route path="/contact" element={<ContactPage />} />
 		<Route path="/login" element={<LoginPage />} />
 		<Route path="/register" element={<RegisterPage />} />
 		<Route path="/forgot" element={<ForgotPasswordPage />} />
 
-		<Route path="/recipes/create" element={<RecipeForm />} />
 	</Routes>
   )
 }

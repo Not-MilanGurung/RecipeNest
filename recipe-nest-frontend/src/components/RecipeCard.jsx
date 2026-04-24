@@ -1,7 +1,8 @@
+import { Link } from "react-router";
 
 const RecipeCard = ({ recipe }) => {
   return (
-	<div className="group bg-neutral rounded-4xl overflow-hidden hover:shadow-2xl hover:shadow-neutral transition-all duration-500 cursor-pointer">
+	<Link to={`/recipes/${recipe._id}`} className="group bg-neutral rounded-4xl overflow-hidden hover:shadow-2xl hover:shadow-neutral transition-all duration-500 cursor-pointer">
 	  {/* Image Container with Zoom Effect */}
 	  <div className="relative h-64 overflow-hidden">
 		<img 
@@ -18,7 +19,7 @@ const RecipeCard = ({ recipe }) => {
 	  <div className="p-8 space-y-4">
 		<div className="space-y-2">
 		  <h3 className="text-2xl font-bold leading-tight text-secondary group-hover:text-primary transition-colors">
-			{recipe.name}
+			  {recipe.name}
 		  </h3>
 		  <p className="text-secondary/50 text-sm line-clamp-2 leading-relaxed">
 			{recipe.description || "A masterfully crafted dish focusing on seasonal ingredients and precise technique."}
@@ -46,7 +47,7 @@ const RecipeCard = ({ recipe }) => {
 		  </span>
 		</div>
 	  </div>
-	</div>
+	</Link>
   );
 };
 
