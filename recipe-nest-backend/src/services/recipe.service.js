@@ -22,7 +22,7 @@ const getById = async (id) => {
 
 const get = async (page, limit, sort, filter) => {
 	const recipes = await Recipe.find(filter)
-		.select('name chef image description')
+		.select('name chef image description metrics category')
 		.populate('chef', 'name role avatar')
 		.skip((page - 1) * limit)
 		.limit(limit)
@@ -92,7 +92,7 @@ const updateById = async (recipeId, userId, data, imageBuffer) => {
 		throw error;
 	}
 
-	const allowedUpdates = ['name', 'steps', 'ingredients', 'description', 'utensils', 'metrics'];
+	const allowedUpdates = ['name', 'steps', 'ingredients', 'description', 'utensils', 'metrics', 'category'];
 	const filteredData = {};
 	for (const key of allowedUpdates) {
 		if (data[key] !== undefined) {

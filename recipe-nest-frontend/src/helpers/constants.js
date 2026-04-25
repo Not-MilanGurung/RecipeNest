@@ -6,4 +6,13 @@ export const apiRefreshTokenRoute= `/users/refresh`
 export const apiLogoutRoute = '/users/logout'
 	
 export const apiGetProfileRoute= `/users/profile`
-export const apiIploadProfilePicRoute= `/users/profile/pic`
+export const apiUploadProfilePicRoute= `/users/profile/pic`
+
+export const roles = {
+	FOODIE: 'foodie',
+	CHEF: 'chef',
+}
+
+export const apiRecipeCreateRoute = `/recipes/`;
+export const apiGetRecipes = '/recipes';
+export const apiGetRecipeById = (id) => `/recipes/${id}`;

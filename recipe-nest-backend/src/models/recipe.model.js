@@ -22,7 +22,13 @@ const recipeSchema = new mongoose.Schema(
 			}
 		},
 		ingredients: {
-			type: [{ type:String, maxlength: [50, 'An ingredient can not be more than 50 characters'] }],
+			type: [ 
+				{
+					name: { type:String, maxlength: [50, 'An ingredient can not be more than 50 characters'] },
+					unit: { type:String, maxlength: [20, 'Unit can not be more than 20 characters']},
+					quantity: { type:Number, min:1}
+				}
+			],
 			validate: {
 				validator: function(v) {
 					return v.length >= 1 && v.length <= 100;
@@ -41,6 +47,15 @@ const recipeSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "Please provide a description"]
 		},
+		category: {
+			type: String,
+			required: [true, "Please provide a category"],
+			enum: {
+				values: ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack', 'Beverage'],
+				message: '{VALUE} is not a valid category'
+			},
+			default: 'Dinner'
+		},
 		metrics: {
 			type: {
 				preptime: {
@@ -50,6 +65,11 @@ const recipeSchema = new mongoose.Schema(
 				cooktime: {
 					type: String,
 					maxlength: [15, 'Preptime can not be more than 15 characters']
+				},
+				servings: {
+					type: Number,
+					min: 1,
+					default: 1
 				}
 			}
 		},

@@ -1,18 +1,18 @@
 import { Route, Routes } from "react-router"
 
 import HomePage from "../pages/HomePage";
-import RecipesPage from "../pages/RecipesPage";
-import ChefsPage from "../pages/ChefsPage";
+import RecipesPage from "../pages/recipe-pages/RecipesPage";
+import ChefsPage from "../pages/chef-pages/ChefsPage";
 import ContactPage from "../pages/ContactPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import RecipeForm from "../pages/recipe-pages/RecipeForm";
 
 function AppRoute() {
   return (
 	<Routes>
 		<Route path="/" element={<HomePage />} />
-		<Route path="/recipes" element={<RecipesPage />} />
 		<Route path="/chefs" element={<ChefsPage />} />
 		<Route path="/contact" element={<ContactPage />} />
 		<Route path="/login" element={<LoginPage />} />
