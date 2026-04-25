@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 
 import api from "../../helpers/api";
 import { apiGetRecipeById } from '../../helpers/constants';
@@ -8,32 +8,33 @@ import NavBar from "../../components/NavBar";
 function RecipeDetailPage() {
 	let params = useParams();
 	const { id } = params;
-	const [recipe, setRecipe] = useState({
-		name: "",
-		description: "",
-		image: null,
-		metrics: {
-			preptime: "",
-			cooktime: "",
-			servings: 0
-		},
-		ingredients: [],
-		steps: [],
-		utensils: [],
-		chef: {
-			name: "",
-			avatar: null
-		}
-	});
 
-	useEffect(() => {
-		api.get(apiGetRecipeById(id)).then((response) => {
-			setRecipe(response.data.data.recipe);
+	const { data: recipe, isLoading, error } = useQuery({
+		queryKey: ['recipe', id],
+		queryFn: () => api.get(apiGetRecipeById(id)).then((response) => {
+			return response.data.data.recipe;
 		}).catch((error) => {
 			console.error('Error fetching recipe details');
 			console.error(error);
-		});
-	}, []);
+			throw error;
+		})
+	});
+
+	if (isLoading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<p className="text-2xl font-bold text-neutral/50">Loading Recipe...</p>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<p className="text-2xl font-bold text-red-500">Error loading recipe details.</p>
+			</div>
+		);
+	}
 
 	return (
 		<>

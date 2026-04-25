@@ -1,10 +1,28 @@
 const recipeService = require('../services/recipe.service');
 
 const getRecipes = async (req, res) => {
-	const { page = 1, limit = 25, sort = { createdAt: -1}, filter } = req.query;
-	
-	const result = await recipeService.get(page, limit, sort, filter);
-	res.status(200).json(result);
+    // Destructure specifically for filtering
+    const { page = 1, limit = 10, sort = '-createdAt', search, category } = req.query;
+    
+    // Build the MongoDB filter object
+    const mongoFilter = {};
+    
+    // Add fuzzy search for names
+    if (search) {
+        mongoFilter.name = { $regex: search, $options: 'i' };
+    }
+    
+    // Exact match for category
+    if (category) {
+        mongoFilter.category = Array.isArray(category) ? { $in: category } : category;
+    }
+    const result = await recipeService.get(
+        parseInt(page), 
+        parseInt(limit), 
+        sort, 
+        mongoFilter
+    );
+    res.status(200).json(result);
 }
 
 const getRecipeById = async (req, res) => {

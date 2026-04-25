@@ -47,6 +47,15 @@ const recipeSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "Please provide a description"]
 		},
+		category: {
+			type: String,
+			required: [true, "Please provide a category"],
+			enum: {
+				values: ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack', 'Beverage'],
+				message: '{VALUE} is not a valid category'
+			},
+			default: 'Dinner'
+		},
 		metrics: {
 			type: {
 				preptime: {
