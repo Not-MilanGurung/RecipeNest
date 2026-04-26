@@ -49,7 +49,7 @@ function RecipeDetailPage() {
             <div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
               <span>Recipes</span>
               <span className="text-neutral/20">•</span>
-              <span>{recipe.name}</span>
+              <span>{recipe.category}</span>
             </div>
 
             <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[0.85] text-neutral">

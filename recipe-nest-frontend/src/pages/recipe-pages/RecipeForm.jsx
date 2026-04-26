@@ -84,7 +84,7 @@ function RecipeForm() {
 			formData.append("metrics", JSON.stringify(data.metrics));
 			formData.append("ingredients", JSON.stringify(data.ingredients));
 			formData.append("steps", JSON.stringify(data.steps));
-
+			formData.append('category', data.category);
 			await api.post(apiRecipeCreateRoute, formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",

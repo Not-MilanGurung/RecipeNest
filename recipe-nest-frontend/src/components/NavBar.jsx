@@ -26,7 +26,7 @@ function NavBar() {
             
             <nav className='h-full flex text-xl'>
                 <NavLink className={navLinkStyle} to="/recipes">Recipes</NavLink>
-                <NavLink className={navLinkStyle} to="/contact">Contact</NavLink>
+                {/* <NavLink className={navLinkStyle} to="/contact">Contact</NavLink> */}
                 {/* Example: Only show My Recipes if logged in */}
                 {user?.role === 'chef' && <NavLink className={navLinkStyle} to={`/chefs/${user._id}`}>My Portfolio</NavLink>}
             </nav>
