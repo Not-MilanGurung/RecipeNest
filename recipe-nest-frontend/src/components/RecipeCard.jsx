@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 const RecipeCard = ({ recipe }) => {
   return (
-	<div className="group bg-neutral rounded-4xl overflow-hidden hover:shadow-2xl hover:shadow-neutral transition-all duration-500 cursor-pointer">
+	<div className="group bg-neutral rounded-4xl overflow-hidden hover:shadow-2xl hover:shadow-neutral transition-all duration-500">
 	  {/* Image Container with Zoom Effect */}
 	  <div className="relative h-64 overflow-hidden">
 		<Link to={`/recipes/${recipe._id}`} >

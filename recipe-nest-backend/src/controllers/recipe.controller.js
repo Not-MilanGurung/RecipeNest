@@ -5,7 +5,7 @@ const getRecipes = async (req, res) => {
     const { page = 1, limit = 10, sort = '-createdAt', search, category, chefId } = req.query;
     
     // Build the MongoDB filter object
-    const mongoFilter = {};
+    const mongoFilter = { flagged: false };
     
     // Add fuzzy search for names
     if (search) {
@@ -74,7 +74,7 @@ const updateRecipe = async (req, res) => {
 		steps: JSON.parse(req.body.steps)
 	}
 
-	const imageBuffer = req.file.buffer;
+	const imageBuffer = req.file? req.file.buffer : null;
 	const userId = req.user.id;
 
 	const result = await recipeService.updateById(id, userId, recipeData, imageBuffer);
