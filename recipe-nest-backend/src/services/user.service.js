@@ -1,4 +1,5 @@
 const { User, userRoles } = require('../models/user.model');
+const Recipe = require('../models/recipe.model'); 
 const cloudinary = require('../configs/cloudinary');
 const jwt = require('jsonwebtoken');
 const { JWT_REFRESH_SECRET } = require('../configs/config');
@@ -130,6 +131,82 @@ const updateProfile = async (userId, data) => {
 	}
 }
 
+const getPortfolio = async (userId) => {
+	const user = await User.findById(userId).select('name role bio socials phone avatar banner');
+	if (!user) {
+		const error = new Error('User not found');
+		error.statusCode = 404;
+		throw error;
+	}
+
+	if (user.role !== userRoles.values.CHEF) {
+		const error = new Error('User is not a chef');
+		error.statusCode = 400;
+		throw error;
+	}
+
+	const recipes = await Recipe.find({ chef: user._id })
+		.select('_id name description image category metrics')
+		.sort({ createdAt: -1 });
+
+	return {
+		success: true,
+		message: 'Loaded profile successfully',
+		data: { chef: user, recipes }
+	};
+}
+
+const updatePortfolio = async (userId, data, fileBuffer) => {
+	const user = await User.findById(userId);
+	if (!user) {
+		const error = new Error('User not found');
+		error.statusCode = 404;
+		throw error;
+	}
+
+	const allowedUpdates = ['bio', 'socials'];
+	const filteredData = {};
+	for (const key of allowedUpdates) {
+		if (data[key] !== undefined) {
+			filteredData[key] = data[key];
+		}
+	}
+	if (fileBuffer) {
+
+		const result = await new Promise( (resolve, reject) => {
+				cloudinary.uploader.upload_stream(
+					{
+						folder: `${cloudinary.rootFolder}/banner`,
+						overwrite: true,
+						resource_type: 'image',
+						transformation: [
+							{ width: 1200, height: 1200, crop: 'auto' },
+							{ fetch_format: 'auto', quality: 'auto'},
+						]
+					},
+					(error, uploadResult) => {
+						if (error) return reject(error);
+						return resolve(uploadResult);
+					}
+				).end(fileBuffer);
+			});
+		filteredData.banner = result.secure_url;
+	}
+
+	const updated = await User.findByIdAndUpdate(user._id, filteredData, {
+		returnDocument: 'after',
+		runValidators: true
+	});
+
+	return {
+		success: true,
+		message: 'Portfolio updated successfully',
+		data: {
+			updated
+		}
+	}
+}
+
 const uploadAvatar = async (fileBuffer, userId) => {
 	const user = await User.findById(userId);
 	if (!user) {
@@ -176,5 +253,7 @@ module.exports = {
 	getProfile,
 	refreshToken,
 	uploadAvatar,
-	updateProfile
+	updateProfile,
+	getPortfolio,
+	updatePortfolio
 }

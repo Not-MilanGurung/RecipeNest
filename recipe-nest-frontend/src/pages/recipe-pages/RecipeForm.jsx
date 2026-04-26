@@ -5,6 +5,8 @@ import NavBar from "../../components/NavBar";
 import useAxiosPrivate from "../../helpers/userAxiosPrivate";
 import { apiRecipeCreateRoute } from "../../helpers/constants";
 
+import { categories } from "../../helpers/constants";
+
 function RecipeForm() {
 	const {
 		register,
@@ -18,6 +20,7 @@ function RecipeForm() {
 			ingredients: [{ name: "", unit: "", quantity: 1 }],
 			steps: [""],
 			description: "",
+			category: "",
 			image: null,
 		},
 	});
@@ -161,7 +164,36 @@ function RecipeForm() {
 						/>
 					</div>
 				</div>
-
+				<section className="space-y-4">
+    <label className="text-xs font-black uppercase text-primary/40 tracking-widest">
+        Culinary Category
+    </label>
+    <div className="relative">
+        <select
+            {...register("category", { required: "Please select a category" })}
+            className="w-full p-5 bg-white rounded-2xl border border-border outline-none focus:ring-2 focus:ring-primary/20 appearance-none font-medium text-neutral cursor-pointer transition-all"
+        >
+            <option value="" disabled>Select a discipline...</option>
+            {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                    {cat}
+                </option>
+            ))}
+        </select>
+        
+        {/* Custom Chevron Icon since appearance-none removes the default one */}
+        <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-primary/30">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </div>
+    </div>
+    {errors.category && (
+        <p className="text-red-500 text-sm ml-2">
+            {errors.category.message}
+        </p>
+    )}
+</section>	
 				{/* 2. THE IMAGE FIELD */}
 				<div className="relative group">
 					<Controller

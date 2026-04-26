@@ -56,6 +56,28 @@ const getProfile = async (req, res) => {
 	res.status(200).json(result);
 }
 
+const getPortfolio = async (req, res) => {
+	const {id: chefId} = req.params;
+	const result = await userServices.getPortfolio(chefId);
+	res.status(200).json(result);
+}
+
+const updatePortfolio = async (req, res) => {
+	const userId = req.user.id;
+	const fileBuffer = req.file ? req.file.buffer : null;
+
+	const data = req.body;
+	if (!data) {
+		const error = new Error('No body provided');
+		error.statusCode = 400;
+		throw error;
+	}
+	const result = await userServices.updatePortfolio(userId, data, fileBuffer);
+
+	res.status(200).json(result);
+
+}
+
 const refreshToken = async (req, res) => {
 	const refreshToken = req.cookies?.jwt;
 	if (!refreshToken) {
@@ -110,5 +132,7 @@ module.exports = {
 	refreshToken,
 	uploadAvatar,
 	logout,
-	updateProfile
+	updateProfile,
+	getPortfolio,
+	updatePortfolio
 }
