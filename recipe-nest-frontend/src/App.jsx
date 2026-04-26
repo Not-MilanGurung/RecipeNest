@@ -1,4 +1,4 @@
-import { BrowserRouter} from "react-router";
+import { BrowserRouter, Routes} from "react-router";
 import AppRoute from "./routes/AppRoute";
 import { useEffect, useState } from "react";
 import { UserContext } from "./helpers/contexts";
@@ -20,7 +20,6 @@ function App() {
 			.then((response) => {
 				const newData = response.data.data;
 				setUser({ user: newData.user, accessToken: newData.accessToken });
-				console.log(user);
 			}).catch((error) => {
 				console.error('Error refreshing token');
 				console.error(error);
@@ -32,8 +31,8 @@ function App() {
 		<QueryClientProvider client={queryClient}>
 			<UserContext value={userContextVal}>
 				<BrowserRouter>
-					<AppRoute />
-					<RecipeRoutes />
+						<AppRoute />
+						<RecipeRoutes />
 				</BrowserRouter>
 			</UserContext>
 		</QueryClientProvider>

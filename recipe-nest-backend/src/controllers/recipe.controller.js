@@ -2,7 +2,7 @@ const recipeService = require('../services/recipe.service');
 
 const getRecipes = async (req, res) => {
     // Destructure specifically for filtering
-    const { page = 1, limit = 10, sort = '-createdAt', search, category } = req.query;
+    const { page = 1, limit = 10, sort = '-createdAt', search, category, chefId } = req.query;
     
     // Build the MongoDB filter object
     const mongoFilter = {};
@@ -16,6 +16,11 @@ const getRecipes = async (req, res) => {
     if (category) {
         mongoFilter.category = Array.isArray(category) ? { $in: category } : category;
     }
+
+	if (chefId) {
+		mongoFilter.chef = chefId;
+	}
+
     const result = await recipeService.get(
         parseInt(page), 
         parseInt(limit), 

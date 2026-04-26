@@ -53,6 +53,18 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: null,
 		},
+		bio: {
+			type: String,
+			default: "No bio"
+		},
+		socials: {
+			type: [mongoose.Schema.Types.Mixed],
+			default: null
+		},
+		banner: {
+			type: String,
+			default: null
+		},
 		isActive: {
 			type: Boolean,
 			default: true,

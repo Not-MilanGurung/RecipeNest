@@ -23,7 +23,7 @@ const getById = async (id) => {
 const get = async (page, limit, sort, filter) => {
 	const recipes = await Recipe.find(filter)
 		.select('name chef image description metrics category')
-		.populate('chef', 'name role avatar')
+		.populate('chef', '_id name role avatar')
 		.skip((page - 1) * limit)
 		.limit(limit)
 		.sort(sort);

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router';
 import { useContext } from 'react';
 import { UserContext } from '../helpers/contexts'; // Adjust path as needed
 import { apiLogoutRoute } from '../helpers/constants';
+import { Link } from 'react-router';
 import api from '../helpers/api';
 
 function NavBar() {
@@ -25,10 +26,9 @@ function NavBar() {
             
             <nav className='h-full flex text-xl'>
                 <NavLink className={navLinkStyle} to="/recipes">Recipes</NavLink>
-                <NavLink className={navLinkStyle} to="/chefs">Chefs</NavLink>
                 <NavLink className={navLinkStyle} to="/contact">Contact</NavLink>
                 {/* Example: Only show My Recipes if logged in */}
-                {user && <NavLink className={navLinkStyle} to="/my-recipes">My Recipes</NavLink>}
+                {user?.role === 'chef' && <NavLink className={navLinkStyle} to={`/chefs/${user._id}`}>My Portfolio</NavLink>}
             </nav>
 
             <div className='flex items-center space-x-4 text-xl'>
@@ -48,7 +48,7 @@ function NavBar() {
 									{user.name?.charAt(0).toUpperCase() || 'C'}
 								</div>
 							)}
-							<span className='hidden md:block font-medium'>{user.name}</span>
+							<Link to='/profile' className='hidden md:block font-medium'>{user.name}</Link>
 						</div>
 
 						<button 
