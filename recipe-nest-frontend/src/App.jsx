@@ -3,7 +3,6 @@ import AppRoute from "./routes/AppRoute";
 import { useEffect, useState } from "react";
 import { UserContext } from "./helpers/contexts";
 import api from "./helpers/api";
-import RecipeRoutes from "./routes/RecipeRoutes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AdminRoutes from "./routes/AdminRoutes";
 
@@ -35,7 +34,6 @@ function App() {
 			<UserContext value={userContextVal}>
 				<BrowserRouter>
 							<AppRoute />
-							<RecipeRoutes />
 							<AdminRoutes />
 				</BrowserRouter>
 			</UserContext>

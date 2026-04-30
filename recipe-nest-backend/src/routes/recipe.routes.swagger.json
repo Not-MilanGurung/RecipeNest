@@ -1,0 +1,897 @@
+{
+  "/recipes": {
+    "get": {
+      "summary": "Get all recipes",
+      "description": "Retrieve a list of all recipes",
+      "tags": ["Recipes"],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Page number",
+          "schema": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Number of items per page",
+          "schema": {
+            "type": "integer",
+            "example": 10
+          }
+        },
+        {
+          "in": "query",
+          "name": "sort",
+          "description": "Sort field",
+          "schema": {
+            "type": "string",
+            "example": "-createdAt"
+          }
+        },
+        {
+          "in": "query",
+          "name": "search",
+          "description": "Fuzzy search term",
+          "schema": {
+            "type": "string",
+            "example": "chicken"
+          }
+        },
+        {
+          "in": "category",
+          "name": "category",
+          "description": "Recipe category",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "string",
+                "example": "dinner"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": ["dinner", "lunch"]
+              }
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "chefId",
+          "description": "Filter by chef ID",
+          "schema": {
+            "type": "string",
+            "example": "69edc3c373a23ce92e5f4a36"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A list of recipes",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "pagination": {
+                        "type": "object",
+                        "properties": {
+                          "page": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "limit": {
+                            "type": "integer",
+                            "example": 10
+                          },
+                          "total": {
+                            "type": "integer",
+                            "example": 100
+                          },
+                          "pages": {
+                            "type": "integer",
+                            "example": 10
+                          }
+                        }
+                      },
+                      "recipes": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/RecipeMinPopulated"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    },
+    "post": {
+      "summary": "Create a new recipe",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name",
+                "steps",
+                "ingredients",
+                "description",
+                "category"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "steps": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "ingredients": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "utensils": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "metrics": {
+                  "type": "object",
+                  "properties": {
+                    "preptime": {
+                      "type": "string"
+                    },
+                    "cooktime": {
+                      "type": "string"
+                    },
+                    "servings": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Recipe created successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Recipe created successfully"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "recipe": {
+                        "$ref": "#/components/schemas/RecipeFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "#/components/responses/NoBodyProvided"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenChefOnly"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    }
+  },
+  "/recipes/{id}": {
+    "get": {
+      "summary": "Get recipe by ID",
+      "tags": ["Recipes"],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Recipe ID",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Recipes returned successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Recipe found"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "recipe": {
+                        "$ref": "#/components/schemas/RecipeFullPopulated"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "$ref": "#/components/responses/RecipeNotFound"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    },
+    "delete": {
+      "summary": "Delete a recipe",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "The recipe ID"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Recipe deleted successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Recipe deleted successfully"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenChefOnly"
+        },
+        "404": {
+          "$ref": "#/components/responses/RecipeNotFound"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    },
+    "put": {
+      "description": "Update a recipe",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "The recipe ID"
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "ingredients": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Flour"
+                      },
+                      "quantity": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "unit": {
+                        "type": "string",
+                        "example": "cups"
+                      }
+                    }
+                  }
+                },
+                "description": {
+                  "type": "string"
+                },
+                "utensils": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "metrics": {
+                  "type": "object",
+                  "properties": {
+                    "prepTime": {
+                      "type": "number",
+                      "example": 10
+                    },
+                    "cookTime": {
+                      "type": "number",
+                      "example": 20
+                    },
+                    "difficulty": {
+                      "type": "string",
+                      "example": "Medium"
+                    }
+                  }
+                },
+                "category": {
+                  "type": "string",
+                  "example": "dinner"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Recipe updated successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Recipe updated successfully"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "updated": {
+                        "$ref": "#/components/schemas/RecipeFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "#/components/responses/NoBodyProvided"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenChefOnly"
+        },
+        "404": {
+          "$ref": "#/components/responses/RecipeNotFound"
+        }
+      }
+    }
+  },
+  "/recipes/{id}/rating": {
+    "get": {
+      "summary": "Get user's rating",
+      "description": "Get user's rating for a specific recipe",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the recipe",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "User's rating for the recipe",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rating": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "user": {
+                            "type": "string"
+                          },
+                          "recipe": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "success": true,
+                "data": {
+                  "rating": {
+                    "userId": "5f8d3c4b9c9d4b0017c7b8e9",
+                    "recipeId": "5f8d3c4b9c9d4b0017c7b8e9",
+                    "value": 4
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "$ref": "#/components/responses/RatingNotFound"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    },
+    "put": {
+      "summary": "Create or Update rating",
+      "description": "Create or update a rating for a specific recipe",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the recipe",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                }
+              },
+              "required": ["rating"]
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Create or update a rating for a specific recipe",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rating": {
+                        "type": "object",
+                        "properties": {
+                          "user": {
+                            "type": "string"
+                          },
+                          "recipe": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 5,
+                            "example": 4
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "400": {
+          "$ref": "#/components/responses/NoBodyProvided"
+        },
+        "404": {
+          "$ref": "#/components/responses/RecipeNotFound"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    }
+  },
+  "/recipes/{id}/comments": {
+    "get": {
+      "summary": "Get comments of recipe",
+      "tags": ["Recipes"],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the recipe",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Got the comments",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "comments": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/CommentPopulated"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    },
+    "post": {
+      "summary": "Create comment",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the recipe",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": ["text"]
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Comment created successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comment"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/RecipeNotFound"
+        },
+        "400": {
+          "$ref": "#/components/responses/NoBodyProvided"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    }
+  },
+  "/recipes/comments/{id}": {
+    "put": {
+      "description": "Update comment",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the comment",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Comment updated successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comment"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "#/components/responses/NoBodyProvided"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/CommentNotFound"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenAction"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    },
+    "delete": {
+      "summary": "Delete comment",
+      "tags": ["Recipes"],
+      "security": [
+        {
+          "BearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the comment",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Comment deleted successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Comment deleted successfully"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/CommentNotFound"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenAction"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    }
+  }
+}

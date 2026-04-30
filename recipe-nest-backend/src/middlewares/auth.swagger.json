@@ -1,0 +1,30 @@
+{
+  "ErrorNoToken": {
+    "summary": "No token provided",
+    "value": {
+      "message": "Not authorized. Please Login",
+      "success": false
+    }
+  },
+  "ErrorUserNotFound": {
+    "summary": "User not found",
+    "value": {
+      "message": "User not found with this token",
+      "success": false
+    }
+  },
+  "ErrorAdminOnly": {
+    "summary": "Admin access required",
+    "value": {
+      "message": "Not authorized. Admin access required.",
+      "success": false
+    }
+  },
+  "ErrorChefOnly": {
+    "summary": "Chef access required",
+    "value": {
+      "message": "Not authorized. Chef access required.",
+      "success": false
+    }
+  }
+}

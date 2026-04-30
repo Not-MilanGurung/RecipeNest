@@ -1,0 +1,72 @@
+{
+  "RecipeNotFound": {
+    "description": "The recipe was not found",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "example": {
+          "success": false,
+          "message": "Recipe not found"
+        }
+      }
+    }
+  },
+  "UserNotFound": {
+    "description": "The user was not found",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "example": {
+          "success": false,
+          "message": "User not found"
+        }
+      }
+    }
+  },
+  "NoBodyProvided": {
+    "description": "No body provided",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "example": {
+          "success": false,
+          "message": "No body provided"
+        }
+      }
+    }
+  },
+  "RatingNotFound": {
+    "description": "The rating was not found",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "example": {
+          "success": false,
+          "message": "Rating not found"
+        }
+      }
+    }
+  },
+  "CommentNotFound": {
+    "description": "The comment was not found",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "example": {
+          "success": false,
+          "message": "Comment not found"
+        }
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ const { User, userRoles } = require('../models/user.model');
 
 const getById = async (id) => {
 	const recipe = await Recipe.findById(id)
-		.populate('chef', 'name role avatar');
+		.populate('chef', '_id name role avatar');
 	if (!recipe) {
 		const error = new Error("Recipe not found");
 		error.statusCode = 404;
@@ -88,7 +88,7 @@ const updateById = async (recipeId, userId, data, imageBuffer) => {
 
 	if (!recipe.chef.equals(userId)){
 		const error = new Error('Unauthorized action');
-		error.statusCode = 401;
+		error.statusCode = 403;
 		throw error;
 	}
 
@@ -134,7 +134,7 @@ const deleteById = async (userId, recipeId) => {
 	const userIsCreatorOrAdmin = recipe.chef.equals(user._id) || user.role === userRoles.values.ADMIN;
 	if (!userIsCreatorOrAdmin){
 		const error = new Error("Unauthorized action");
-		error.statusCode = 401;
+		error.statusCode = 403;
 		throw error;
 	}
 

@@ -1,0 +1,170 @@
+{
+  "Comment": {
+    "type": "object",
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "user": {
+        "type": "string"
+      },
+      "recipe": {
+        "type": "string"
+      },
+      "text": {
+        "type": "string"
+      },
+      "createdAt": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updatedAt": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "CommentPopulated": {
+    "allOf": [
+      { "$ref": "#/components/schemas/Comment" },
+      {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "UserMin": {
+    "type": "object",
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "role": {
+        "type": "string"
+      },
+      "avatar": {
+        "type": "string"
+      }
+    }
+  },
+  "RecipeMin": {
+    "type": "object",
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "image": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "category": {
+        "type": "string"
+      },
+      "flagged": {
+        "type": "boolean"
+      },
+      "metrics": {
+        "type": "object",
+        "properties": {
+          "preptime": {
+            "type": "string"
+          },
+          "cooktime": {
+            "type": "string"
+          },
+          "servings": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "RecipeFull": {
+    "allOf": [
+      { "$ref": "#/components/schemas/RecipeMin" },
+      {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "utensils": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "RecipeMinPopulated": {
+    "allOf": [
+      { "$ref": "#/components/schemas/RecipeMin" },
+      {
+        "type": "object",
+        "properties": {
+          "chef": {
+            "$ref": "#/components/schemas/UserMin"
+          }
+        }
+      }
+    ]
+  },
+  "RecipeFullPopulated": {
+    "allOf": [
+      { "$ref": "#/components/schemas/RecipeFull" },
+      {
+        "type": "object",
+        "properties": {
+          "chef": {
+            "$ref": "#/components/schemas/UserMin"
+          }
+        }
+      }
+    ]
+  }
+}
