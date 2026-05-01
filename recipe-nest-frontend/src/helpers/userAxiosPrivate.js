@@ -28,6 +28,7 @@ const useAxiosPrivate = () => {
 
                     try {
                         // Refresh the token
+						setData(prev => ({ ...prev, isLoading: true }));
                         const response = await api.get('/users/refresh');
                         const newAccessToken = response.data.data.accessToken;
 

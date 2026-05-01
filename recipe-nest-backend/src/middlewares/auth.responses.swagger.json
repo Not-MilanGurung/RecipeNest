@@ -1,0 +1,74 @@
+{
+  "Unauthorized": {
+    "description": "The user is not authenticated",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "examples": {
+          "ErrorNoToken": {
+            "$ref": "#/components/examples/ErrorNoToken"
+          },
+          "ErrorUserNotFound": {
+            "$ref": "#/components/examples/ErrorUserNotFound"
+          }
+        }
+      }
+    }
+  },
+  "ForbiddenChefOnly": {
+    "description": "The user is not a chef",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "examples": {
+          "ErrorChefOnly": {
+            "$ref": "#/components/examples/ErrorChefOnly"
+          }
+        }
+      }
+    }
+  },
+  "ForbiddenAdminOnly": {
+    "description": "The user is not an admin",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "examples": {
+          "ErrorAdminOnly": {
+            "$ref": "#/components/examples/ErrorAdminOnly"
+          }
+        }
+      }
+    }
+  },
+  "InternalError": {
+    "description": "An internal error occurred",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        }
+      }
+    }
+  },
+  "ForbiddenAction": {
+    "description": "The user is not allowed to perform this action",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "#/components/schemas/ErrorResponse"
+        },
+        "example": {
+          "success": false,
+          "message": "Unauthorized to perform this action"
+        }
+      }
+    }
+  }
+}

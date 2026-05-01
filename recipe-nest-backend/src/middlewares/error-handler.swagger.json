@@ -1,0 +1,15 @@
+{
+  "ErrorResponse": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string",
+        "example": "Internal server error"
+      },
+      "success": {
+        "type": "boolean",
+        "example": false
+      }
+    }
+  }
+}

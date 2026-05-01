@@ -1,0 +1,173 @@
+{
+  "/admin/stats": {
+    "get": {
+      "summary": "Get admin statistics",
+      "description": "Retrieve statistics for the admin panel",
+      "tags": ["Admin"],
+      "responses": {
+        "200": {
+          "description": "Statistics retrieved successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "chefCount": {
+                        "type": "number"
+                      },
+                      "foodieCount": {
+                        "type": "number"
+                      },
+                      "recipeCount": {
+                        "type": "number"
+                      },
+                      "recentRecipes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "_id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "image": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "category": {
+                              "type": "string"
+                            },
+                            "flagged": {
+                              "type": "boolean"
+                            },
+                            "metrics": {
+                              "type": "object",
+                              "properties": {
+                                "preptime": {
+                                  "type": "string"
+                                },
+                                "cooktime": {
+                                  "type": "string"
+                                },
+                                "servings": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "chef": {
+                              "type": "object",
+                              "properties": {
+                                "_id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "role": {
+                                  "type": "string"
+                                },
+                                "avatar": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenAdminOnly"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    }
+  },
+  "/admin/recipes/{id}/flag": {
+    "post": {
+      "summary": "Flag a recipe for review",
+      "description": "Flag a recipe for review by an admin",
+      "tags": ["Admin"],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "The recipe ID"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Recipe flagged successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Recipe flagged status updated"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "recipe": {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "flagged": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "#/components/responses/ForbiddenAdminOnly"
+        },
+        "404": {
+          "$ref": "#/components/responses/RecipeNotFound"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalError"
+        }
+      }
+    }
+  }
+}

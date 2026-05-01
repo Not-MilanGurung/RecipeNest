@@ -1,259 +1,306 @@
-const { User, userRoles } = require('../models/user.model');
-const Recipe = require('../models/recipe.model'); 
-const cloudinary = require('../configs/cloudinary');
-const jwt = require('jsonwebtoken');
-const { JWT_REFRESH_SECRET } = require('../configs/config');
+const { User, userRoles } = require("../models/user.model");
+const Recipe = require("../models/recipe.model");
+const cloudinary = require("../configs/cloudinary");
+const jwt = require("jsonwebtoken");
+const { JWT_REFRESH_SECRET } = require("../configs/config");
+ const mongoose = require('mongoose');
 
 
 const register = async (data) => {
-	const existingUser = await User.findOne({ email: data.email });
-	if (existingUser) {
-		const error = new Error('User already exists with this email');
-		error.statusCode = 400;
-		throw error;
-	}
+  const existingUser = await User.findOne({ email: data.email });
+  if (existingUser) {
+    const error = new Error("User already exists with this email");
+    error.statusCode = 400;
+    throw error;
+  }
 
-	const newUser = new User({
-		name: data.name,
-		email: data.email,
-		password: data.password,
-		role: data.role
-	});
+  const newUser = new User({
+    name: data.name,
+    email: data.email,
+    password: data.password,
+    role: data.role,
+  });
 
-	await newUser.save();
-	const user = newUser.toJSON();
-	delete user.password;
-	const accessToken = newUser.generateAccessToken();
-	const refreshToken = newUser.generateRefreshToken();
+  await newUser.save();
+  const user = newUser.toJSON();
+  delete user.password;
+  const accessToken = newUser.generateAccessToken();
+  const refreshToken = newUser.generateRefreshToken();
 
-	return {
-		refreshToken,
-		success: true,
-		message: 'User registerd successfully',
-		data: { user: user, accessToken}
-	};
-}
+  return {
+    refreshToken,
+    success: true,
+    message: "User registerd successfully",
+    data: { user: user, accessToken },
+  };
+};
 
 const login = async (email, password) => {
-	const user = await User.findOne({ email }).select('+password');
-	if (!user) {
-		const error = new Error('Invalid email or password');
-		error.statusCode = 401;
-		throw error;
-	}
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
+  }
 
-	if (!user.isActive) {
-		const error = new Error('Your account has been deactivated');
-		error.statusCode = 403;
-		throw error;
-	}
-	const isPasswordValid = await user.comparePassword(password);
-	if (!isPasswordValid) {
-		const error = new Error('Invalid email or password');
-		error.statusCode = 401;
-		throw error;
-	}
+  if (!user.isActive) {
+    const error = new Error("Your account has been deactivated");
+    error.statusCode = 403;
+    throw error;
+  }
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
+  }
 
-	const data = user.toJSON();
-	delete data.password;
-	const accessToken = user.generateAccessToken();
-	const refreshToken = user.generateRefreshToken();
+  const data = user.toJSON();
+  delete data.password;
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
 
-	return {
-		refreshToken,
-		success: true,
-		message: 'Login succesfull',
-		data: { user: data, accessToken}
-	};
-}
+  return {
+    refreshToken,
+    success: true,
+    message: "Login succesfull",
+    data: { user: data, accessToken },
+  };
+};
 
 const refreshToken = async (refreshToken) => {
-	const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
-	const user = await User.findById(decoded.id);
+  const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+  const user = await User.findById(decoded.id);
 
-	if (!user) {
-		const error = new Error('User not found with this token');
-		error.statusCode = 401;
-		throw error;
-    }
+  if (!user) {
+    const error = new Error("User not found with this token");
+    error.statusCode = 401;
+    throw error;
+  }
 
-	const accessToken = user.generateAccessToken();
+  const accessToken = user.generateAccessToken();
 
-	return {
-		success: true,
-		message: 'Access token generated successfully',
-		data: { user, accessToken }
-	};
-}
+  return {
+    success: true,
+    message: "Access token generated successfully",
+    data: { user, accessToken },
+  };
+};
 
 const getProfile = async (userId) => {
-	const user = await User.findById(userId);
-	if (!user) {
-		const error = new Error('User not found');
-		error.statusCode = 404;
-		throw error;
-	}
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
 
-	return {
-		success: true,
-		message: 'Loaded profile successfully',
-		data: { user }
-	};
-}
+  return {
+    success: true,
+    message: "Loaded profile successfully",
+    data: { user },
+  };
+};
 
 const updateProfile = async (userId, data) => {
-	const user = await User.findById(userId);
-	if (!user) {
-		const error = new Error('User not found');
-		error.statusCode = 404;
-		throw error;
-	}
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
 
-	const allowedUpdates = ['name', 'email', 'phone'];
-	const filteredData = {};
-	for (const key of allowedUpdates) {
-		if (data[key] !== undefined) {
-			filteredData[key] = data[key];
-		}
-	}
+  const allowedUpdates = ["name", "email", "phone"];
+  const filteredData = {};
+  for (const key of allowedUpdates) {
+    if (data[key] !== undefined) {
+      filteredData[key] = data[key];
+    }
+  }
 
-	const updated = await User.findByIdAndUpdate(user._id, filteredData, {
-		returnDocument: 'after',
-		runValidators: true
-	});
+  const updated = await User.findByIdAndUpdate(user._id, filteredData, {
+    returnDocument: "after",
+    runValidators: true,
+  });
 
-	return {
-		success: true,
-		message: 'Profile updated successfully',
-		data: {
-			updated
-		}
-	}
-}
+  return {
+    success: true,
+    message: "Profile updated successfully",
+    data: {
+      updated,
+    },
+  };
+};
 
 const getPortfolio = async (userId) => {
-	const user = await User.findById(userId).select('name role bio socials phone avatar banner');
-	if (!user) {
-		const error = new Error('User not found');
-		error.statusCode = 404;
-		throw error;
-	}
+  const user = await User.findById(userId).select(
+    "name role bio socials phone avatar banner",
+  );
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
 
-	if (user.role !== userRoles.values.CHEF) {
-		const error = new Error('User is not a chef');
-		error.statusCode = 400;
-		throw error;
-	}
+  if (user.role !== userRoles.values.CHEF) {
+    const error = new Error("User is not a chef");
+    error.statusCode = 400;
+    throw error;
+  }
 
-	const recipes = await Recipe.find({ chef: user._id })
-		.select('_id name description image category metrics')
-		.sort({ createdAt: -1 });
 
-	return {
-		success: true,
-		message: 'Loaded profile successfully',
-		data: { chef: user, recipes }
-	};
-}
+const recipes = await Recipe.aggregate([
+  // 1. Filter for the specific chef
+  { 
+    $match: { chef: new mongoose.Types.ObjectId(user._id) } 
+  },
+
+  // 2. Sort by creation date (Descending)
+  { 
+    $sort: { createdAt: -1 } 
+  },
+
+  // 3. Join with the Ratings collection
+  {
+    $lookup: {
+      from: "ratings",           // Must match your MongoDB collection name
+      localField: "_id",         // Recipe ID
+      foreignField: "recipe",    // Field in Rating model that refs Recipe
+      as: "allRatings"
+    }
+  },
+
+  // 4. Calculate Average and Count
+  {
+    $addFields: {
+      ratingAverage: { $ifNull: [{ $avg: "$allRatings.value" }, 0] },
+      ratingCount: { $size: "$allRatings" }
+    }
+  },
+
+  // 5. Select only the necessary fields (Equivalent to .select)
+  {
+    $project: {
+      _id: 1,
+      name: 1,
+      description: 1,
+      image: 1,
+      category: 1,
+      metrics: 1,
+      ratingAverage: 1,
+      ratingCount: 1,
+      createdAt: 1
+    }
+  }
+]);
+
+  return {
+    success: true,
+    message: "Loaded profile successfully",
+    data: { chef: user, recipes },
+  };
+};
 
 const updatePortfolio = async (userId, data, fileBuffer) => {
-	const user = await User.findById(userId);
-	if (!user) {
-		const error = new Error('User not found');
-		error.statusCode = 404;
-		throw error;
-	}
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
 
-	const allowedUpdates = ['bio', 'socials'];
-	const filteredData = {};
-	for (const key of allowedUpdates) {
-		if (data[key] !== undefined) {
-			filteredData[key] = data[key];
-		}
-	}
-	if (fileBuffer) {
+  const allowedUpdates = ["bio", "socials"];
+  const filteredData = {};
+  for (const key of allowedUpdates) {
+    if (data[key] !== undefined) {
+      filteredData[key] = data[key];
+    }
+  }
+  if (fileBuffer) {
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: `${cloudinary.rootFolder}/banner`,
+            overwrite: true,
+            resource_type: "image",
+            transformation: [
+              { width: 1200, height: 1200, crop: "auto" },
+              { fetch_format: "auto", quality: "auto" },
+            ],
+          },
+          (error, uploadResult) => {
+            if (error) return reject(error);
+            return resolve(uploadResult);
+          },
+        )
+        .end(fileBuffer);
+    });
+    filteredData.banner = result.secure_url;
+  }
 
-		const result = await new Promise( (resolve, reject) => {
-				cloudinary.uploader.upload_stream(
-					{
-						folder: `${cloudinary.rootFolder}/banner`,
-						overwrite: true,
-						resource_type: 'image',
-						transformation: [
-							{ width: 1200, height: 1200, crop: 'auto' },
-							{ fetch_format: 'auto', quality: 'auto'},
-						]
-					},
-					(error, uploadResult) => {
-						if (error) return reject(error);
-						return resolve(uploadResult);
-					}
-				).end(fileBuffer);
-			});
-		filteredData.banner = result.secure_url;
-	}
+  const updated = await User.findByIdAndUpdate(user._id, filteredData, {
+    returnDocument: "after",
+    runValidators: true,
+  });
 
-	const updated = await User.findByIdAndUpdate(user._id, filteredData, {
-		returnDocument: 'after',
-		runValidators: true
-	});
-
-	return {
-		success: true,
-		message: 'Portfolio updated successfully',
-		data: {
-			updated
-		}
-	}
-}
+  return {
+    success: true,
+    message: "Portfolio updated successfully",
+    data: {
+      updated,
+    },
+  };
+};
 
 const uploadAvatar = async (fileBuffer, userId) => {
-	const user = await User.findById(userId);
-	if (!user) {
-		const error = new Error('User not found');
-		error.statusCode = 404;
-		throw error;
-	}
-	const result = await new Promise( (resolve, reject) => {
-		cloudinary.uploader.upload_stream(
-			{
-				folder: `${cloudinary.rootFolder}/avatars`,
-				public_id: userId,
-				overwrite: true,
-				resource_type: 'image',
-				transformation: [
-					{ width: 300, height: 300, crop: 'auto' },
-					{ fetch_format: 'auto', quality: 'auto'},
-					{ gravity: 'face' }
-				]
-			},
-			(error, uploadResult) => {
-				if (error) return reject(error);
-				return resolve(uploadResult);
-			}
-		).end(fileBuffer);
-	});
-	
-	
-	user.avatar = result.secure_url;
-	await user.save();
-	
-	return {
-		success: true,
-		message: 'User avatar uploaded',
-		data: {
-			user
-		}
-	};
-}
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  const result = await new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: `${cloudinary.rootFolder}/avatars`,
+          public_id: userId,
+          overwrite: true,
+          resource_type: "image",
+          transformation: [
+            { width: 300, height: 300, crop: "auto" },
+            { fetch_format: "auto", quality: "auto" },
+            { gravity: "face" },
+          ],
+        },
+        (error, uploadResult) => {
+          if (error) return reject(error);
+          return resolve(uploadResult);
+        },
+      )
+      .end(fileBuffer);
+  });
+
+  user.avatar = result.secure_url;
+  await user.save();
+
+  return {
+    success: true,
+    message: "User avatar uploaded",
+    data: {
+      user,
+    },
+  };
+};
 
 module.exports = {
-	register,
-	login,
-	getProfile,
-	refreshToken,
-	uploadAvatar,
-	updateProfile,
-	getPortfolio,
-	updatePortfolio
-}
+  register,
+  login,
+  getProfile,
+  refreshToken,
+  uploadAvatar,
+  updateProfile,
+  getPortfolio,
+  updatePortfolio,
+};
