@@ -9,6 +9,9 @@ const useAxiosPrivate = () => {
         // Request Interceptor
         const requestIntercept = api.interceptors.request.use(
             (config) => {
+                if (!data.user){
+                    return config;
+                }
                 if (!config.headers['Authorization'] && data?.accessToken) {
                     config.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 }
@@ -21,8 +24,11 @@ const useAxiosPrivate = () => {
         const responseIntercept = api.interceptors.response.use(
             (response) => response,
             async (error) => {
+                console.log(data);
+                if (!data.user) {
+                    return Promise.reject(error);
+                }
                 const prevRequest = error?.config;
-
                 if (error?.response?.status === 401 && !prevRequest?.sent) {
                     prevRequest.sent = true;
 
@@ -30,6 +36,7 @@ const useAxiosPrivate = () => {
                         // Refresh the token
 						setData(prev => ({ ...prev, isLoading: true }));
                         const response = await api.get('/users/refresh');
+                        console.log("Got response: ", response);
                         const newAccessToken = response.data.data.accessToken;
 
                         // UPDATE CONTEXT: Crucial step
@@ -40,6 +47,7 @@ const useAxiosPrivate = () => {
                         return api(prevRequest);
                     } catch (refreshError) {
                         // If refresh fails (e.g., refresh token expired), log out user
+                        console.log("Logged out");
                         setData(null);
                         return Promise.reject(refreshError);
                     }
