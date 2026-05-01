@@ -40,9 +40,9 @@ const adminOnly = (req, res, next) => {
 
 const chefOnly = (req, res, next) => {
   if (
-    req.user
-    && (req.user.role === userRoles.values.CHEF
-      || req.user.role === userRoles.values.ADMIN)
+    req.user &&
+    (req.user.role === userRoles.values.CHEF ||
+      req.user.role === userRoles.values.ADMIN)
   ) {
     next();
   } else {

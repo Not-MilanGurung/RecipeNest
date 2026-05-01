@@ -48,6 +48,14 @@
       }
     ]
   },
+  "Rating": {
+    "type": "object",
+    "properties": {
+      "user": {"type": "string"},
+      "recipe": {"type": "string"},
+      "value": {"type": "number"}
+    }
+  },
   "UserMin": {
     "type": "object",
     "properties": {

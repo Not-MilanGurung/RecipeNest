@@ -1,129 +1,133 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN, parseExpiresInToMilliSeconds } = require('../configs/config');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const {
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+  JWT_ACCESS_EXPIRES_IN,
+  JWT_REFRESH_EXPIRES_IN,
+  parseExpiresInToMilliSeconds,
+} = require("../configs/config");
 
 const userRoles = Object.freeze({
-	values: {
-		FOODIE: 'foodie',
-		CHEF: 'chef',
-		ADMIN: 'admin',
-	},
+  values: {
+    FOODIE: "foodie",
+    CHEF: "chef",
+    ADMIN: "admin",
+  },
 
-	isValid(value) {
-		return Object.values(this.values).includes(value);
-	},
+  isValid(value) {
+    return Object.values(this.values).includes(value);
+  },
 });
 
 const userSchema = new mongoose.Schema(
-	{
-		name: {
-			type: String,
-			required: [true, "Please provide a name"],
-			trim: true,
-			maxlength: [50, 'Name cannot be more than 50 characters'],
-		},
-		email: {
-			type: String,
-			required: [true, 'Please provide an email'],
-			unique: true,
-			lowercase: true,
-			trim: true,
-			match: [
-				/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-				"Please provide a valid email",
-			]
-		},
-		password: {
-			type: String,
-			required: [true, 'Please provide a password'],
-			minlength: [8, "Password must be at least 8 characters"],
-			select: false
-		},
-		role: {
-			type: String,
-			enum: Object.values(userRoles.values),
-			default: userRoles.values.FOODIE,
-		},
-		avatar: {
-			type: String,
-			default: null,
-		},
-		phone: {
-			type: String,
-			default: null,
-		},
-		bio: {
-			type: String,
-			default: "No bio"
-		},
-		socials: {
-			type: [mongoose.Schema.Types.Mixed],
-			default: null
-		},
-		banner: {
-			type: String,
-			default: null
-		},
-		isActive: {
-			type: Boolean,
-			default: true,
-		},
-	},
-	{
-		timestamps: true,
-	},
-	
+  {
+    name: {
+      type: String,
+      required: [true, "Please provide a name"],
+      trim: true,
+      maxlength: [50, "Name cannot be more than 50 characters"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide an email"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please provide a valid email",
+      ],
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: [8, "Password must be at least 8 characters"],
+      select: false,
+    },
+    role: {
+      type: String,
+      enum: Object.values(userRoles.values),
+      default: userRoles.values.FOODIE,
+    },
+    avatar: {
+      type: String,
+      default: null,
+    },
+    phone: {
+      type: String,
+      default: null,
+    },
+    bio: {
+      type: String,
+      default: "No bio",
+    },
+    socials: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: null,
+    },
+    banner: {
+      type: String,
+      default: null,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  {
+    timestamps: true,
+  },
 );
 
-userSchema.pre('save', async function() {
-	if (!this.isModified('password')) return;
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-	this.password = await bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.methods.comparePassword = async function(candidatePassword) {
-
-	return await bcrypt.compare(candidatePassword, this.password);
-} 
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 userSchema.methods.generateAccessToken = function () {
-	return jwt.sign(
-		{
-			id: this._id,
-			email: this.email,
-			role: this.role
-		},
-		JWT_ACCESS_SECRET,
-		{
-			expiresIn: JWT_ACCESS_EXPIRES_IN
-		}
-	);
-
-}
+  return jwt.sign(
+    {
+      id: this._id,
+      email: this.email,
+      role: this.role,
+    },
+    JWT_ACCESS_SECRET,
+    {
+      expiresIn: JWT_ACCESS_EXPIRES_IN,
+    },
+  );
+};
 
 userSchema.methods.generateRefreshToken = function () {
-	return {
-		token: jwt.sign(
-			{
-				id: this._id,
-			},
-			JWT_REFRESH_SECRET,
-			{
-				expiresIn: JWT_REFRESH_EXPIRES_IN
-			}
-		),
-		config: {
-			httpOnly: true,
-			sameSite: 'None', secure: true,
-            maxAge: parseExpiresInToMilliSeconds(JWT_REFRESH_EXPIRES_IN)
-		}
-	};
-}
+  return {
+    token: jwt.sign(
+      {
+        id: this._id,
+      },
+      JWT_REFRESH_SECRET,
+      {
+        expiresIn: JWT_REFRESH_EXPIRES_IN,
+      },
+    ),
+    config: {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+      maxAge: parseExpiresInToMilliSeconds(JWT_REFRESH_EXPIRES_IN),
+    },
+  };
+};
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
-module.exports ={
-	userRoles,
-	User
-}
+module.exports = {
+  userRoles,
+  User,
+};

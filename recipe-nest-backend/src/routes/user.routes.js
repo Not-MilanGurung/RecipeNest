@@ -1,13 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const { authOnly, adminOnly, chefOnly } = require('../middlewares/auth.middleware');
-const multer = require('../configs/multer');
+const {
+  authOnly,
+  adminOnly,
+  chefOnly,
+} = require("../middlewares/auth.middleware");
+const multer = require("../configs/multer");
 
-const userController = require('../controllers/user.controller');
+const userController = require("../controllers/user.controller");
 
 // Public routes
-/** 
+/**
  * @swagger
  * /users/register:
  *   post:
@@ -23,9 +27,9 @@ const userController = require('../controllers/user.controller');
  *       400:
  *         description: Bad request
  */
-router.post('/register', userController.register);
+router.post("/register", userController.register);
 
-/** 
+/**
  * @swagger
  * /users/login:
  *   post:
@@ -41,9 +45,9 @@ router.post('/register', userController.register);
  *       400:
  *         description: Bad request
  */
-router.post('/login', userController.login);
+router.post("/login", userController.login);
 
-/** 
+/**
  * @swagger
  * /users/refresh:
  *   get:
@@ -55,9 +59,9 @@ router.post('/login', userController.login);
  *       400:
  *         description: Bad request
  */
-router.get('/refresh', userController.refreshToken);
+router.get("/refresh", userController.refreshToken);
 
-/** 
+/**
  * @swagger
  * /users/logout:
  *   get:
@@ -69,9 +73,9 @@ router.get('/refresh', userController.refreshToken);
  *       400:
  *         description: Bad request
  */
-router.get('/logout', userController.logout);
+router.get("/logout", userController.logout);
 
-/** 
+/**
  * @swagger
  * /users/{id}/portfolio:
  *   get:
@@ -90,10 +94,10 @@ router.get('/logout', userController.logout);
  *       404:
  *         description: User not found
  */
-router.get('/:id/portfolio', userController.getPortfolio);
+router.get("/:id/portfolio", userController.getPortfolio);
 
 // Protected routes
-/** 
+/**
  * @swagger
  * /users/profile:
  *   get:
@@ -107,9 +111,9 @@ router.get('/:id/portfolio', userController.getPortfolio);
  *       404:
  *         description: User not found
  */
-router.get('/profile', authOnly, userController.getProfile);
+router.get("/profile", authOnly, userController.getProfile);
 
-/** 
+/**
  * @swagger
  * /users/profile/pic:
  *   put:
@@ -133,9 +137,14 @@ router.get('/profile', authOnly, userController.getProfile);
  *       400:
  *         description: Bad request
  */
-router.put('/profile/pic', authOnly, multer.single('avatar'), userController.uploadAvatar);
+router.put(
+  "/profile/pic",
+  authOnly,
+  multer.single("avatar"),
+  userController.uploadAvatar,
+);
 
-/** 
+/**
  * @swagger
  * /users/profile:
  *   put:
@@ -153,9 +162,9 @@ router.put('/profile/pic', authOnly, multer.single('avatar'), userController.upl
  *       400:
  *         description: Bad request
  */
-router.put('/profile', authOnly, userController.updateProfile);
+router.put("/profile", authOnly, userController.updateProfile);
 
-/** 
+/**
  * @swagger
  * /users/portfolio:
  *   put:
@@ -179,8 +188,12 @@ router.put('/profile', authOnly, userController.updateProfile);
  *       400:
  *         description: Bad request
  */
-router.put('/portfolio', authOnly, chefOnly, multer.single('banner'), userController.updatePortfolio);
-
-
+router.put(
+  "/portfolio",
+  authOnly,
+  chefOnly,
+  multer.single("banner"),
+  userController.updatePortfolio,
+);
 
 module.exports = router;

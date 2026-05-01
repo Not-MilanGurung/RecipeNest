@@ -1,22 +1,24 @@
-const Comment = require('../models/comment.model');
-const Recipe = require('../models/recipe.model');
-const {userRoles } = require('../models/user.model');
+const Comment = require("../models/comment.model");
+const Recipe = require("../models/recipe.model");
+const { userRoles } = require("../models/user.model");
 
 const getCommentsByRecipeId = async (recipeId) => {
-  const comments = await Comment.find({ recipeId })
-      .populate('user', 'name avatar');
+  const comments = await Comment.find({ recipe: recipeId }).populate(
+    "user",
+    "name avatar",
+  );
   return {
     success: true,
     data: {
-      comments
-    }
-  }
+      comments,
+    },
+  };
 };
 
 const createCommentByRecipeId = async (userId, recipeId, content) => {
   const recipe = await Recipe.findById(recipeId);
   if (!recipe) {
-    const error = new Error('Recipe not found');
+    const error = new Error("Recipe not found");
     error.statusCode = 404;
     throw error;
   }
@@ -24,28 +26,28 @@ const createCommentByRecipeId = async (userId, recipeId, content) => {
   const comment = new Comment({
     user: userId,
     recipe: recipeId,
-    text: content
+    text: content,
   });
 
   await comment.save();
   return {
     success: true,
     data: {
-      comment
-    }
+      comment,
+    },
   };
-}
+};
 
 const updateCommentById = async (userId, commentId, content) => {
   const comment = await Comment.findById(commentId);
   if (!comment) {
-    const error = new Error('Comment not found');
+    const error = new Error("Comment not found");
     error.statusCode = 404;
     throw error;
   }
 
   if (!comment.user.equals(userId)) {
-    const error = new Error('Unauthorized to update this comment');
+    const error = new Error("Unauthorized to update this comment");
     error.statusCode = 403;
     throw error;
   }
@@ -56,30 +58,30 @@ const updateCommentById = async (userId, commentId, content) => {
   return {
     success: true,
     data: {
-      comment
-    }
+      comment,
+    },
   };
 };
 
 const deleteCommentById = async (userId, userRole, commentId) => {
   const comment = await Comment.findById(commentId);
   if (!comment) {
-    const error = new Error('Comment not found');
+    const error = new Error("Comment not found");
     error.statusCode = 404;
     throw error;
   }
 
-  if (!comment.user.equals(userId) || userRole !== userRoles.ADMIN) {
-    const error = new Error('Unauthorized to delete this comment');
+  if (!comment.user.equals(userId) && userRole !== userRoles.ADMIN) {
+    const error = new Error("Unauthorized to delete this comment");
     error.statusCode = 403;
     throw error;
   }
 
-  await comment.remove();
+  await comment.deleteOne();
 
   return {
     success: true,
-    message: 'Comment deleted successfully'
+    message: "Comment deleted successfully",
   };
 };
 
@@ -87,5 +89,5 @@ module.exports = {
   getCommentsByRecipeId,
   createCommentByRecipeId,
   updateCommentById,
-  deleteCommentById
-}
+  deleteCommentById,
+};

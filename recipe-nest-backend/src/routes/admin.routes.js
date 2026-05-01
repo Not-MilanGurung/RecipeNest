@@ -14,6 +14,11 @@ const swaggerPaths = {};
 
 router.get("/stats", authOnly, adminOnly, adminController.stats);
 
-router.post("/recipes/:id/flag", authOnly, adminOnly, adminController.flagRecipe);
+router.post(
+  "/recipes/:id/flag",
+  authOnly,
+  adminOnly,
+  adminController.flagRecipe,
+);
 
 module.exports = router;
