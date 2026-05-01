@@ -11,12 +11,9 @@ const stats = async () => {
   const {
     page = 1,
     limit = 10,
-    sort = "-createdAt",
-    search,
-    category,
-    chefId,
+    sort = { createdAt: -1 }
   } = {};
-  const recipes = await getRecipes(page, limit, sort, search, category, chefId);
+  const recipes = await getRecipes(page, limit, sort, {});
   const recentRecipes = recipes.data.recipes;
   return {
     success: true,
