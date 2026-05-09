@@ -1,14 +1,15 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+import swaggerJsdoc from "swagger-jsdoc";
 // Routes
-const adminPaths = require("./routes/admin.routes.swagger.json");
-const recipePaths = require("./routes/recipe.routes.swagger.json");
+import adminPaths from "./routes/admin.routes.swagger.json";
+import recipePaths from "./routes/recipe.routes.swagger.json";
 // Middleware
-const swaggerErrorSchema = require("./middlewares/error-handler.swagger.json");
-const authErrorExamples = require("./middlewares/auth.swagger.json");
-const authResponses = require("./middlewares/auth.responses.swagger.json");
+import swaggerErrorSchema from "./middlewares/error-handler.swagger.json";
+import authErrorExamples from "./middlewares/auth.swagger.json";
+import authResponses from "./middlewares/auth.responses.swagger.json";
 // Model
-const modelSchemas = require("./models/schemas.swagger.json");
-const modelResponses = require("./models/model.responses.swagger.json");
+import modelSchemas from "./models/schemas.swagger.json";
+import modelResponses from "./models/model.responses.swagger.json";
+import type { RequestHandler } from "express";
 
 const options = {
   definition: {
@@ -48,10 +49,12 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 
-const router = require("express").Router();
-
-router.get("/", (req, res) => {
+import { Router }  from "express";
+const router = Router();
+const swaggerRoute: RequestHandler = (req, res) => {
   res.status(200).json(specs);
-});
+}
 
-module.exports = router;
+router.get("/", swaggerRoute);
+
+export default router;

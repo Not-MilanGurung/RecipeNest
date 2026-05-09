@@ -1,27 +1,58 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const {
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import {
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_EXPIRES_IN,
   parseExpiresInToMilliSeconds,
-} = require("../configs/config");
+} from "../configs/config";
 
-const userRoles = Object.freeze({
+export const userRoles = Object.freeze({
   values: {
     FOODIE: "foodie",
     CHEF: "chef",
     ADMIN: "admin",
   },
 
-  isValid(value) {
+  isValid(value: string) {
     return Object.values(this.values).includes(value);
   },
 });
 
-const userSchema = new mongoose.Schema(
+export enum EUserRole {
+  FOODIE = "foodie",
+  CHEF = "chef",
+  ADMIN = "admin",
+}
+
+export interface IUser {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  role: EUserRole;
+  password: string;
+  avatar?: string;
+  phone?: string;
+  bio?: string;
+  socials?: {
+    platform: string;
+    url: string;
+  }[];
+  banner?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface IUserWithMethods extends IUser {
+  comparePassword(candidatePassword: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): { token: string; config: { httpOnly: boolean; sameSite: string; secure: boolean; maxAge: number } };
+}
+
+const userSchema = new mongoose.Schema<IUserWithMethods>(
   {
     name: {
       type: String,
@@ -35,10 +66,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        "Please provide a valid email",
-      ],
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email"],
     },
     password: {
       type: String,
@@ -48,8 +76,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: Object.values(userRoles.values),
-      default: userRoles.values.FOODIE,
+      enum: EUserRole,
+      default: EUserRole.FOODIE,
     },
     avatar: {
       type: String,
@@ -64,7 +92,18 @@ const userSchema = new mongoose.Schema(
       default: "No bio",
     },
     socials: {
-      type: [mongoose.Schema.Types.Mixed],
+      type: [
+        {
+          platform: {
+            type: String,
+            maxlength: [30, "Social media platform name cannot be more than 30 characters"],
+          },
+          url: {
+            type: String,
+            match: [/^https?:\/\/.+\..+$/, "Please provide a valid URL"],
+          },
+        },
+      ],
       default: null,
     },
     banner: {
@@ -87,7 +126,7 @@ userSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
@@ -95,13 +134,11 @@ userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       id: this._id,
-      email: this.email,
-      role: this.role,
     },
-    JWT_ACCESS_SECRET,
+    JWT_ACCESS_SECRET as jwt.Secret,
     {
       expiresIn: JWT_ACCESS_EXPIRES_IN,
-    },
+    } as jwt.SignOptions,
   );
 };
 
@@ -111,10 +148,10 @@ userSchema.methods.generateRefreshToken = function () {
       {
         id: this._id,
       },
-      JWT_REFRESH_SECRET,
+      JWT_REFRESH_SECRET as jwt.Secret,
       {
         expiresIn: JWT_REFRESH_EXPIRES_IN,
-      },
+      } as jwt.SignOptions,
     ),
     config: {
       httpOnly: true,
@@ -126,8 +163,4 @@ userSchema.methods.generateRefreshToken = function () {
 };
 
 const User = mongoose.model("User", userSchema);
-
-module.exports = {
-  userRoles,
-  User,
-};
+export default User;

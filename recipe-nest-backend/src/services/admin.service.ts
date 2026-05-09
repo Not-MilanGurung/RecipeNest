@@ -1,8 +1,9 @@
-const { User, userRoles } = require("../models/user.model");
-const Recipe = require("../models/recipe.model");
-const { get: getRecipes } = require("../services/recipe.service");
+import User, { type IUser, userRoles } from "../models/user.model";
+import Recipe from "../models/recipe.model";
+import {type CustomError } from "../middlewares/error-handler.middleware";
+import { get as getRecipes } from "./recipe.service";
 
-const stats = async () => {
+export const stats = async () => {
   const chefCount = await User.countDocuments({ role: userRoles.values.CHEF });
   const foodieCount = await User.countDocuments({
     role: userRoles.values.FOODIE,
@@ -11,7 +12,7 @@ const stats = async () => {
   const {
     page = 1,
     limit = 10,
-    sort = { createdAt: -1 }
+    sort = { createdAt: -1 as -1 },
   } = {};
   const recipes = await getRecipes(page, limit, sort, {});
   const recentRecipes = recipes.data.recipes;
@@ -21,14 +22,14 @@ const stats = async () => {
   };
 };
 
-const flagRecipe = async (id, flagged) => {
+export const flagRecipe = async (id : string, flagged : boolean) => {
   const recipe = await Recipe.findByIdAndUpdate(
     id,
     { flagged },
     { returnDocument: "after" },
   );
   if (!recipe) {
-    const error = new Error("Recipe not found");
+    const error : CustomError = new Error("Recipe not found");
     error.statusCode = 404;
     throw error;
   }
@@ -38,5 +39,3 @@ const flagRecipe = async (id, flagged) => {
     data: { recipe },
   };
 };
-
-module.exports = { stats, flagRecipe };

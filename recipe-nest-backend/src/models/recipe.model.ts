@@ -1,6 +1,30 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const recipeSchema = new mongoose.Schema(
+export interface IRecipe {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  image: string | null;
+  steps: string[];
+  ingredients: {
+    name: string;
+    unit: string;
+    quantity: number;
+  }[];
+  utensils?: string[];
+  description: string;
+  category: string;
+  metrics?: {
+    preptime?: string;
+    cooktime?: string;
+    servings?: number;
+  };
+  chef: mongoose.Types.ObjectId;
+  flagged: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const recipeSchema = new mongoose.Schema<IRecipe>(
   {
     name: {
       type: String,
@@ -15,7 +39,7 @@ const recipeSchema = new mongoose.Schema(
     steps: {
       type: [String],
       validate: {
-        validator: function (v) {
+        validator: function (v: string[]) {
           return v.length >= 1 && v.length <= 100;
         },
         message: "Steps list must be between 1 to 100 ",
@@ -36,7 +60,7 @@ const recipeSchema = new mongoose.Schema(
         },
       ],
       validate: {
-        validator: function (v) {
+        validator: function (v: any[]) {
           return v.length >= 1 && v.length <= 100;
         },
         message: "Ingredients list must be between 1 to 100 ",
@@ -104,4 +128,4 @@ const recipeSchema = new mongoose.Schema(
 );
 
 const Recipe = mongoose.model("Recipe", recipeSchema);
-module.exports = Recipe;
+export default Recipe;
