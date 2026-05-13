@@ -1,6 +1,5 @@
 import cors from "cors";
-import type { CustomError } from "./error-handler.middleware";
-import { FRONTEND_URL } from "../configs/config";
+import { FRONTEND_URL } from "../configs/config.js";
 
 const corsOptions: cors.CorsOptions = {
   origin: FRONTEND_URL,

@@ -1,14 +1,14 @@
 import swaggerJsdoc from "swagger-jsdoc";
 // Routes
-import adminPaths from "./routes/admin.routes.swagger.json";
-import recipePaths from "./routes/recipe.routes.swagger.json";
+import adminPaths from "./routes/admin.routes.swagger.json" with { type: 'json'};
+import recipePaths from "./routes/recipe.routes.swagger.json" with { type: 'json'};
 // Middleware
-import swaggerErrorSchema from "./middlewares/error-handler.swagger.json";
-import authErrorExamples from "./middlewares/auth.swagger.json";
-import authResponses from "./middlewares/auth.responses.swagger.json";
+import swaggerErrorSchema  from "./middlewares/error-handler.swagger.json" with { type: 'json'};
+import authErrorExamples from "./middlewares/auth.swagger.json" with { type: 'json'};
+import authResponses from "./middlewares/auth.responses.swagger.json" with { type: 'json'};
 // Model
-import modelSchemas from "./models/schemas.swagger.json";
-import modelResponses from "./models/model.responses.swagger.json";
+import modelSchemas from "./models/schemas.swagger.json" with { type: 'json'};
+import modelResponses from "./models/model.responses.swagger.json" with { type: 'json'};
 import type { RequestHandler } from "express";
 
 const options = {

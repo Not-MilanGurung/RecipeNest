@@ -1,32 +1,38 @@
-const userServices = require("../services/user.service");
+import type { RequestHandler, Request, Response } from "express";
+import type { CustomError } from '../middlewares/error-handler.middleware.js';
+import type { AuthenicatedResponse } from '../middlewares/auth.middleware.js';
 
-const register = async (req, res) => {
+import * as userServices from "../services/user.service.js";
+
+
+export const register: RequestHandler = async (req, res) => {
   const data = req.body;
   if (!data) {
-    const error = new Error("No body provided");
+    const error: CustomError = new Error("No body provided");
     error.statusCode = 400;
     throw error;
   }
 
   const result = await userServices.register(data);
 
+  // Making the refresh token a http only cookie
   const refreshToken = result.refreshToken;
-  delete result.refreshToken;
+  const out : Omit<typeof result, "refreshToken"> = result;
   res.cookie("jwt", refreshToken.token, refreshToken.config);
-
-  res.status(201).json(result);
+  
+  res.status(201).json(out);
 };
 
-const login = async (req, res) => {
+export const login : RequestHandler = async (req, res) => {
   const data = req.body;
   if (!data) {
-    const error = new Error("No body provided");
+    const error : CustomError = new Error("No body provided");
     error.statusCode = 400;
     throw error;
   }
   const { email, password } = data;
 
-  const errors = [];
+  const errors : string[] = [];
 
   const emailIsEmpty = !email || email.trim() === "";
   if (emailIsEmpty) errors.push("Email is required");
@@ -35,40 +41,40 @@ const login = async (req, res) => {
   if (passwordIsEmpty) errors.push("Password is required");
 
   if (errors.length > 0) {
-    const error = new Error("Missing fields");
+    const error : CustomError = new Error("Missing fields");
     error.statusCode = 400;
     error.errorList = errors;
     throw error;
   }
 
-  const result = await userServices.login(data.email, data.password);
+  const result = await userServices.login({ email, password });
 
   const refreshToken = result.refreshToken;
-  delete result.refreshToken;
+  const output : Omit<typeof result, "refreshToken"> = result;
   res.cookie("jwt", refreshToken.token, refreshToken.config);
 
-  res.status(200).json(result);
+  res.status(200).json(output);
 };
 
-const getProfile = async (req, res) => {
-  const userId = req.user.id;
+export const getProfile = async (req : Request, res : AuthenicatedResponse) => {
+  const userId = res.locals.user._id.toString();
   const result = await userServices.getProfile(userId);
   res.status(200).json(result);
 };
 
-const getPortfolio = async (req, res) => {
+export const getPortfolio = async (req : Request<{ id: string }>, res : Response) => {
   const { id: chefId } = req.params;
   const result = await userServices.getPortfolio(chefId);
   res.status(200).json(result);
 };
 
-const updatePortfolio = async (req, res) => {
-  const userId = req.user.id;
-  const fileBuffer = req.file ? req.file.buffer : null;
+export const updatePortfolio = async (req : Request, res : AuthenicatedResponse) => {
+  const userId = res.locals.user._id.toString();
+  const fileBuffer = req.file?.buffer;
 
   const data = req.body;
   if (!data) {
-    const error = new Error("No body provided");
+    const error : CustomError = new Error("No body provided");
     error.statusCode = 400;
     throw error;
   }
@@ -77,10 +83,10 @@ const updatePortfolio = async (req, res) => {
   res.status(200).json(result);
 };
 
-const refreshToken = async (req, res) => {
+export const refreshToken : RequestHandler= async (req , res) => {
   const refreshToken = req.cookies?.jwt;
   if (!refreshToken) {
-    const error = new Error("Unauthorized access");
+    const error : CustomError = new Error("Unauthorized access");
     error.statusCode = 401;
     throw error;
   }
@@ -89,11 +95,11 @@ const refreshToken = async (req, res) => {
   res.status(200).json(result);
 };
 
-const uploadAvatar = async (req, res) => {
+export const uploadAvatar = async (req : Request, res : AuthenicatedResponse) => {
   const file = req.file;
-  const userId = req.user.id;
+  const userId = res.locals.user._id.toString();
   if (!file) {
-    const error = new Error("Profile pic is need");
+    const error : CustomError = new Error("Profile pic is need");
     error.statusCode = 400;
     throw error;
   }
@@ -102,11 +108,11 @@ const uploadAvatar = async (req, res) => {
   res.status(200).json(result);
 };
 
-const updateProfile = async (req, res) => {
-  const userId = req.user.id;
+export const updateProfile = async (req : Request, res : AuthenicatedResponse) => {
+  const userId = res.locals.user._id.toString();
   const data = req.body;
   if (!data) {
-    const error = new Error("No body provided");
+    const error : CustomError = new Error("No body provided");
     error.statusCode = 400;
     throw error;
   }
@@ -115,7 +121,7 @@ const updateProfile = async (req, res) => {
   res.status(200).json(result);
 };
 
-const logout = async (req, res) => {
+export const logout : RequestHandler = async (req, res) => {
   res.clearCookie("jwt", { httpOnly: true });
   res.status(200).json({
     success: true,
@@ -123,14 +129,3 @@ const logout = async (req, res) => {
   });
 };
 
-module.exports = {
-  register,
-  login,
-  getProfile,
-  refreshToken,
-  uploadAvatar,
-  logout,
-  updateProfile,
-  getPortfolio,
-  updatePortfolio,
-};

@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import User, { userRoles, type IUser } from "../models/user.model";
-import { JWT_ACCESS_SECRET } from "../configs/config";
+import User, { userRoles, type IUser } from "../models/user.model.js";
+import { JWT_ACCESS_SECRET } from "../configs/config.js";
 import type { RequestHandler, Request, Response, Locals, NextFunction } from "express";
-import type { CustomError } from "./error-handler.middleware";
+import type { CustomError } from "./error-handler.middleware.js";
 
 
 export type AuthenicatedResponse = Response & {

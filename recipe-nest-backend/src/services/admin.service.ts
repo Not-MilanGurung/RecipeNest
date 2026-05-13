@@ -1,7 +1,7 @@
-import User, { type IUser, userRoles } from "../models/user.model";
-import Recipe from "../models/recipe.model";
-import {type CustomError } from "../middlewares/error-handler.middleware";
-import { get as getRecipes } from "./recipe.service";
+import User, { type IUser, userRoles } from "../models/user.model.js";
+import Recipe from "../models/recipe.model.js";
+import {type CustomError } from "../middlewares/error-handler.middleware.js";
+import { get as getRecipes } from "./recipe.service.js";
 
 export const stats = async () => {
   const chefCount = await User.countDocuments({ role: userRoles.values.CHEF });

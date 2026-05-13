@@ -2,29 +2,29 @@ import express  from "express";
 import cookieParser from "cookie-parser";
 const app = express();
 
-import "./configs/database";
+import "./configs/database.js";
 
-import { PORT } from "./configs/config";
-import cors from "./middlewares/cors.middleware";
+import { PORT } from "./configs/config.js";
+import cors from "./middlewares/cors.middleware.js";
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors);
 
-const userRoutes = require("./routes/user.routes");
-const recipeRoutes = require("./routes/recipe.routes");
-const adminRoutes  = require("./routes/admin.routes");
+import userRoutes from "./routes/user.routes.js";
+import recipeRoutes from "./routes/recipe.routes.js";
+import adminRoutes  from "./routes/admin.routes.js";
 
 app.use("/users", userRoutes);
 app.use("/recipes", recipeRoutes);
 app.use("/admin", adminRoutes);
 
 // Swagger endpoint
-const swaggerRoute = require("./swagger");
+import swaggerRoute from "./swagger.js";
 
 app.use("/api-docs.json", swaggerRoute);
 
-import errorHandler from "./middlewares/error-handler.middleware";
+import errorHandler from "./middlewares/error-handler.middleware.js";
 app.use(errorHandler);
 
 app.listen(PORT, () => {

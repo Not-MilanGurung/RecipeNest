@@ -1,14 +1,10 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const {
-  authOnly,
-  adminOnly,
-  chefOnly,
-} = require("../middlewares/auth.middleware");
-const multer = require("../configs/multer");
+import { authOnly, chefOnly } from "../middlewares/auth.middleware.js";
+import multer from "../configs/multer.js";
 
-const userController = require("../controllers/user.controller");
+import * as userController from "../controllers/user.controller.js";
 
 // Public routes
 /**
@@ -137,12 +133,7 @@ router.get("/profile", authOnly, userController.getProfile);
  *       400:
  *         description: Bad request
  */
-router.put(
-  "/profile/pic",
-  authOnly,
-  multer.single("avatar"),
-  userController.uploadAvatar,
-);
+router.put("/profile/pic", authOnly, multer.single("avatar"), userController.uploadAvatar);
 
 /**
  * @swagger
@@ -188,12 +179,6 @@ router.put("/profile", authOnly, userController.updateProfile);
  *       400:
  *         description: Bad request
  */
-router.put(
-  "/portfolio",
-  authOnly,
-  chefOnly,
-  multer.single("banner"),
-  userController.updatePortfolio,
-);
+router.put("/portfolio", authOnly, chefOnly, multer.single("banner"), userController.updatePortfolio);
 
-module.exports = router;
+export default router;

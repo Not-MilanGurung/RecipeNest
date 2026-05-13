@@ -1,10 +1,10 @@
 import type { Request } from "express";
-import * as ratingService from "../services/rating.service";
-import { type AuthenicatedResponse } from '../middlewares/auth.middleware'
-import type { CustomError } from '../middlewares/error-handler.middleware'
+import * as ratingService from "../services/rating.service.js";
+import { type AuthenicatedResponse } from '../middlewares/auth.middleware.js'
+import type { CustomError } from '../middlewares/error-handler.middleware.js'
 
 export const getRating = async (req : Request<{ id : string}>, res: AuthenicatedResponse) => {
-  const userId = res.locals.user.id;
+  const userId = res.locals.user._id.toString();
   const { id: recipeId } = req.params;
 
   const result = await ratingService.getRating(userId, recipeId);
@@ -12,7 +12,7 @@ export const getRating = async (req : Request<{ id : string}>, res: Authenicated
 };
 
 export const createRatingOrUpdate = async (req : Request<{ id : string}, any, { rating: number}>, res: AuthenicatedResponse) => {
-  const userId = res.locals.user.id;
+  const userId = res.locals.user._id.toString();
   const { id: recipeId } = req.params;
   const { rating } = req.body;
   if (!rating || rating < 1 || rating > 5) {

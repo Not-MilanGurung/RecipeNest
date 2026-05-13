@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import type { CookieOptions } from "express";
 import {
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_EXPIRES_IN,
   parseExpiresInToMilliSeconds,
-} from "../configs/config";
+} from "../configs/config.js";
 
 export const userRoles = Object.freeze({
   values: {
@@ -49,7 +50,7 @@ export interface IUser {
 interface IUserWithMethods extends IUser {
   comparePassword(candidatePassword: string): Promise<boolean>;
   generateAccessToken(): string;
-  generateRefreshToken(): { token: string; config: { httpOnly: boolean; sameSite: string; secure: boolean; maxAge: number } };
+  generateRefreshToken(): { token: string; config: CookieOptions };
 }
 
 const userSchema = new mongoose.Schema<IUserWithMethods>(
@@ -143,6 +144,12 @@ userSchema.methods.generateAccessToken = function () {
 };
 
 userSchema.methods.generateRefreshToken = function () {
+  const config: CookieOptions = {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+    maxAge: parseExpiresInToMilliSeconds(JWT_REFRESH_EXPIRES_IN),
+  };
   return {
     token: jwt.sign(
       {
@@ -153,12 +160,7 @@ userSchema.methods.generateRefreshToken = function () {
         expiresIn: JWT_REFRESH_EXPIRES_IN,
       } as jwt.SignOptions,
     ),
-    config: {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: parseExpiresInToMilliSeconds(JWT_REFRESH_EXPIRES_IN),
-    },
+    config,
   };
 };
 

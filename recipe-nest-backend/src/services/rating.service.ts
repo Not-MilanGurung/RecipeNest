@@ -1,6 +1,6 @@
-import Rating from "../models/rating.model";
-import Recipe from "../models/recipe.model";
-import type { CustomError } from "../middlewares/error-handler.middleware";
+import Rating from "../models/rating.model.js";
+import Recipe from "../models/recipe.model.js";
+import type { CustomError } from "../middlewares/error-handler.middleware.js";
 
 export const getRating = async (userId: string, recipeId: string) => {
   const rating = await Rating.findOne({ user: userId, recipe: recipeId });

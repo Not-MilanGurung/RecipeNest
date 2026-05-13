@@ -33,11 +33,11 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UserContext value={userContextVal}>
+      <UserContext.Provider value={userContextVal}>
         <BrowserRouter>
           <AppRoute />
         </BrowserRouter>
-      </UserContext>
+      </UserContext.Provider>
     </QueryClientProvider>
   );
 }

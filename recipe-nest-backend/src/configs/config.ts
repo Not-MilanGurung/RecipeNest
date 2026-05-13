@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const PORT: string = process.env.PORT as string;
 export const FRONTEND_URL: string = process.env.FRONTEND_URL as string;

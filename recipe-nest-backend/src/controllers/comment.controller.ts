@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 
-import { type CustomError } from '../middlewares/error-handler.middleware';
-import * as commentController from "../services/comment.service";
-import { type AuthenicatedResponse } from '../middlewares/auth.middleware';
+import { type CustomError } from '../middlewares/error-handler.middleware.js';
+import * as commentController from "../services/comment.service.js";
+import { type AuthenicatedResponse } from '../middlewares/auth.middleware.js';
 
 export const getCommentsByRecipeId = async (req : Request<{ id : string }>, res : Response) => {
   const { id } = req.params;
@@ -19,7 +19,7 @@ export const createCommentByRecipeId = async (req : Request<{ id : string }, any
     throw error;
   }
   const result = await commentController.createCommentByRecipeId(
-    res.locals.user,
+    res.locals.user._id.toString(),
     id,
     content,
   );
@@ -35,7 +35,7 @@ export const updateCommentById = async (req : Request<{ id : string }, any, { co
     throw error;
   }
   const result = await commentController.updateCommentById(
-    res.locals.user.id,
+    res.locals.user._id.toString(),
     id,
     content,
   );
@@ -45,7 +45,7 @@ export const updateCommentById = async (req : Request<{ id : string }, any, { co
 export const deleteCommentById = async (req : Request<{ id : string }>, res : AuthenicatedResponse) => {
   const { id } = req.params;
   const result = await commentController.deleteCommentById(
-    res.locals.user.id,
+    res.locals.user._id.toString(),
     res.locals.user.role,
     id,
   );

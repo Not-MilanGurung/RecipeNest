@@ -1,7 +1,7 @@
-import Comment from "../models/comment.model";
-import Recipe from "../models/recipe.model";
-import { userRoles } from "../models/user.model";
-import { type CustomError } from "../middlewares/error-handler.middleware";
+import Comment from "../models/comment.model.js";
+import Recipe from "../models/recipe.model.js";
+import { userRoles } from "../models/user.model.js";
+import { type CustomError } from "../middlewares/error-handler.middleware.js";
 
 export const getCommentsByRecipeId = async (recipeId : string) => {
   const comments = await Comment.find({ recipe: recipeId }).populate(

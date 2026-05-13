@@ -1,5 +1,5 @@
-import * as adminService from "../services/admin.service";
-import { type CustomError } from "../middlewares/error-handler.middleware";
+import * as adminService from "../services/admin.service.js";
+import { type CustomError } from "../middlewares/error-handler.middleware.js";
 import type { RequestHandler, Request, Response } from "express";
 
 export const stats : RequestHandler  = async (req, res) => {

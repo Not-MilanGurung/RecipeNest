@@ -1,31 +1,25 @@
 import type { Request, Response } from "express";
-import {type CustomError} from '../middlewares/error-handler.middleware';
-import * as recipeService from "../services/recipe.service";
-import {type AuthenicatedResponse} from '../middlewares/auth.middleware';
+import {type CustomError} from '../middlewares/error-handler.middleware.js';
+import * as recipeService from "../services/recipe.service.js";
+import {type AuthenicatedResponse} from '../middlewares/auth.middleware.js';
+import { z } from 'zod';
 
-export const getRecipes = async (
-  req: Request<
-    {},
-    any,
-    any,
-    { page?: number; limit?: number; sort?: string | any; search?: string; category?: string; chefId?: string }
-  >,
-  res: Response,
-) => {
+const getRecipesQuery = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).default(10),
+  sort: z.string().optional().default("-createdAt"),
+  search: z.string().optional(),
+  category: z.string().optional(),
+  chefId: z.string().optional()
+});
+
+export const getRecipes = async (req: Request, res: Response) => {
   // Destructure specifically for filtering
-  const { page = 1, limit = 10, sort = "-createdAt", search, category, chefId } = req.query;
+  const { page, limit, sort, search, category, chefId } = getRecipesQuery.parse(req.query);
 
-  let sortObject: Record<string, 1 | -1> = {};
-
-  if (typeof sort === "string") {
-    // Handle string format "-fieldName" or "fieldName"
-    const isDescending = sort.startsWith("-");
-    const field = isDescending ? sort.substring(1) : sort;
-    sortObject[field] = isDescending ? -1 : 1;
-  } else {
-    // Fallback to a default if the sort variable is empty or invalid
-    sortObject = sort || { createdAt: -1 };
-  }
+  const sortObject: Record<string, 1 | -1> = typeof sort === "string" 
+  ? { [sort.startsWith("-") ? sort.substring(1) : sort]: sort.startsWith("-") ? -1 : 1 }
+  : { createdAt: -1 };
 
   // Build the MongoDB filter object
   const mongoFilter : Record<string, any> = { flagged: false };
@@ -43,7 +37,6 @@ export const getRecipes = async (
   if (chefId) {
     mongoFilter.chef = chefId;
   }
-
   const result = await recipeService.get(page, limit, sortObject, mongoFilter);
   res.status(200).json(result);
 };
@@ -64,7 +57,7 @@ export const createRecipe = async (req: Request<{}, any, recipeService.RecipeCre
   }
 
   const imageBuffer = req.file?.buffer;
-  const userId = res.locals.user.id;
+  const userId = res.locals.user._id.toString();
 
   const result = await recipeService.create(userId, req.body, imageBuffer);
   res.status(201).json(result);
@@ -87,14 +80,14 @@ export const updateRecipe = async (req: Request<{ id: string }>, res: Authenicat
   };
 
   const imageBuffer = req.file?.buffer ;
-  const userId = res.locals.user.id;
+  const userId = res.locals.user._id.toString();
 
   const result = await recipeService.updateById(id, userId, recipeData, imageBuffer);
   res.status(200).json(result);
 };
 
 export const deleteRecipe = async (req: Request<{ id: string }>, res: AuthenicatedResponse) => {
-  const userId = res.locals.user.id;
+  const userId = res.locals.user._id.toString();
   const { id } = req.params;
 
   const result = await recipeService.deleteById(userId, id);

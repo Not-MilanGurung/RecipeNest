@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { type UploadApiResponse } from "cloudinary";
-import cloudinary, { rootFolder } from "../configs/cloudinary";
-import User, { userRoles, type IUser } from "../models/user.model";
-import Recipe from "../models/recipe.model";
-import { JWT_REFRESH_SECRET } from "../configs/config";
-import { type CustomError } from "../middlewares/error-handler.middleware";
+import cloudinary, { rootFolder } from "../configs/cloudinary.js";
+import User, { userRoles, type IUser } from "../models/user.model.js";
+import Recipe, { type IRecipe } from "../models/recipe.model.js";
+import { JWT_REFRESH_SECRET } from "../configs/config.js";
+import { type CustomError } from "../middlewares/error-handler.middleware.js";
 
 export const register = async (data: Pick<IUser, "name" | "email" | "password"> & Partial<Pick<IUser, "role">>) => {
   const existingUser = await User.findOne({ email: data.email });
@@ -133,7 +133,12 @@ export const getPortfolio = async (userId: string) => {
     throw error;
   }
 
-  const recipes = await Recipe.aggregate([
+  const recipes: Array<
+    Pick<IRecipe, "_id" | "name" | "description" | "image" | "category" | "metrics" | "createdAt"> & {
+      ratingAverage: number;
+      ratingCount: number;
+    }
+  > = await Recipe.aggregate([
     // 1. Filter for the specific chef
     {
       $match: { chef: new mongoose.Types.ObjectId(user._id) },
@@ -177,15 +182,15 @@ export const getPortfolio = async (userId: string) => {
       },
     },
   ]);
-
+  const userData: Pick<IUser, "name" | "role" | "bio" | "socials" | "phone" | "avatar" | "banner"> = user;
   return {
     success: true,
     message: "Loaded profile successfully",
-    data: { chef: user, recipes },
+    data: { chef: userData, recipes },
   };
 };
 
-export const updatePortfolio = async (userId: string, data: { [key: string]: unknown }, fileBuffer?: Buffer) => {
+export const updatePortfolio = async (userId: string, data: Partial<Pick<IUser, "bio" | "socials">>, fileBuffer?: Buffer) => {
   const user = await User.findById(userId);
   if (!user) {
     const error: CustomError = new Error("User not found");
@@ -193,13 +198,8 @@ export const updatePortfolio = async (userId: string, data: { [key: string]: unk
     throw error;
   }
 
-  const allowedUpdates = ["bio", "socials"];
-  const filteredData: any = {};
-  for (const key of allowedUpdates) {
-    if (data[key] !== undefined) {
-      filteredData[key] = data[key];
-    }
-  }
+  const filteredData: Partial<Pick<IUser, "bio" | "socials" | "banner">> = data;
+
   if (fileBuffer) {
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       cloudinary.uploader
@@ -228,11 +228,18 @@ export const updatePortfolio = async (userId: string, data: { [key: string]: unk
     runValidators: true,
   });
 
+  if (!updated) {
+    const error: CustomError = new Error("Failed to update portfolio");
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const userData: Omit<IUser, "password"> = updated;
   return {
     success: true,
     message: "Portfolio updated successfully",
     data: {
-      updated,
+      updated: userData,
     },
   };
 };
@@ -270,7 +277,6 @@ export const uploadAvatar = async (fileBuffer: Buffer, userId: string) => {
   await user.save();
   const userData: Omit<IUser, "password"> = user;
   return {
-    success: true,
     message: "User avatar uploaded",
     data: {
       user: userData,

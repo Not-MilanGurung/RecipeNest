@@ -1,7 +1,7 @@
-import Recipe from "../models/recipe.model";
-import cloudinary, { rootFolder } from "../configs/cloudinary";
-import User, { userRoles } from "../models/user.model";
-import { type CustomError } from "../middlewares/error-handler.middleware";
+import Recipe from "../models/recipe.model.js";
+import cloudinary, { rootFolder } from "../configs/cloudinary.js";
+import User, { userRoles } from "../models/user.model.js";
+import { type CustomError } from "../middlewares/error-handler.middleware.js";
 import type { UploadApiResponse } from "cloudinary";
 import mongoose from 'mongoose';
 
