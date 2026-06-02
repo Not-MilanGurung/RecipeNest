@@ -1,6 +1,6 @@
 import Recipe from "../models/recipe.model.js";
 import cloudinary, { rootFolder } from "../configs/cloudinary.js";
-import User, { userRoles } from "../models/user.model.js";
+import User, { EUserRole } from "../models/user.model.js";
 import { type CustomError } from "../middlewares/error-handler.middleware.js";
 import type { UploadApiResponse } from "cloudinary";
 import mongoose from 'mongoose';
@@ -231,7 +231,7 @@ export const deleteById = async (userId: string, recipeId: string) => {
     throw error;
   }
 
-  const userIsCreatorOrAdmin = recipe.chef.equals(user._id) || user.role === userRoles.values.ADMIN;
+  const userIsCreatorOrAdmin = recipe.chef.equals(user._id) || user.role === EUserRole.ADMIN;
   if (!userIsCreatorOrAdmin) {
     const error : CustomError = new Error("Unauthorized action");
     error.statusCode = 403;

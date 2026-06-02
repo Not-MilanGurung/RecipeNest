@@ -1,6 +1,6 @@
 import Comment from "../models/comment.model.js";
 import Recipe from "../models/recipe.model.js";
-import { userRoles } from "../models/user.model.js";
+import { EUserRole } from "../models/user.model.js";
 import { type CustomError } from "../middlewares/error-handler.middleware.js";
 
 export const getCommentsByRecipeId = async (recipeId : string) => {
@@ -72,7 +72,7 @@ export const deleteCommentById = async (userId : string, userRole : string, comm
     throw error;
   }
 
-  if (!comment.user.equals(userId) && userRole !== userRoles.values.ADMIN) {
+  if (!comment.user.equals(userId) && userRole !== EUserRole.ADMIN) {
     const error : CustomError = new Error("Unauthorized to delete this comment");
     error.statusCode = 403;
     throw error;

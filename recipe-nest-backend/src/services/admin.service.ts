@@ -1,12 +1,12 @@
-import User, { type IUser, userRoles } from "../models/user.model.js";
+import User, { type IUser, EUserRole } from "../models/user.model.js";
 import Recipe from "../models/recipe.model.js";
 import {type CustomError } from "../middlewares/error-handler.middleware.js";
 import { get as getRecipes } from "./recipe.service.js";
 
 export const stats = async () => {
-  const chefCount = await User.countDocuments({ role: userRoles.values.CHEF });
+  const chefCount = await User.countDocuments({ role: EUserRole.CHEF });
   const foodieCount = await User.countDocuments({
-    role: userRoles.values.FOODIE,
+    role: EUserRole.FOODIE,
   });
   const recipeCount = await Recipe.countDocuments();
   const {

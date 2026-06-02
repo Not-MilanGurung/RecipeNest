@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User, { userRoles, type IUser } from "../models/user.model.js";
+import User, { EUserRole, type IUser } from "../models/user.model.js";
 import { JWT_ACCESS_SECRET } from "../configs/config.js";
 import type { RequestHandler, Request, Response, Locals, NextFunction } from "express";
 import type { CustomError } from "./error-handler.middleware.js";
@@ -43,7 +43,7 @@ export const authOnly: RequestHandler = async (req, res, next) => {
 };
 
 export const adminOnly = (req : Request, res: AuthenicatedResponse, next: NextFunction) => {
-  if (res.locals.user && res.locals.user.role === userRoles.values.ADMIN) {
+  if (res.locals.user && res.locals.user.role === EUserRole.ADMIN) {
     next();
   } else {
     const error: CustomError = new Error("Not authorized. Admin access required.");
@@ -53,7 +53,7 @@ export const adminOnly = (req : Request, res: AuthenicatedResponse, next: NextFu
 };
 
 export const chefOnly = (req: Request, res: AuthenicatedResponse, next: NextFunction) => {
-  if (res.locals.user && (res.locals.user.role === userRoles.values.CHEF || res.locals.user.role === userRoles.values.ADMIN)) {
+  if (res.locals.user && (res.locals.user.role === EUserRole.CHEF || res.locals.user.role === EUserRole.ADMIN)) {
     next();
   } else {
     const error: CustomError = new Error("Not authorized, Chef access required.");

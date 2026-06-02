@@ -2,12 +2,12 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { type UploadApiResponse } from "cloudinary";
 import cloudinary, { rootFolder } from "../configs/cloudinary.js";
-import User, { userRoles, type IUser } from "../models/user.model.js";
+import User, { EUserRole, type IUser } from "../models/user.model.js";
 import Recipe, { type IRecipe } from "../models/recipe.model.js";
 import { JWT_REFRESH_SECRET } from "../configs/config.js";
 import { type CustomError } from "../middlewares/error-handler.middleware.js";
 
-export const register = async (data: Pick<IUser, "name" | "email" | "password"> & Partial<Pick<IUser, "role">>) => {
+export const register = async (data: Pick<IUser, "name" | "email" | "password"> & { role?: IUser["role"] | undefined }) => {
   const existingUser = await User.findOne({ email: data.email });
   if (existingUser) {
     const error: CustomError = new Error("User already exists with this email");
@@ -23,7 +23,8 @@ export const register = async (data: Pick<IUser, "name" | "email" | "password"> 
   });
 
   await newUser.save();
-  const user: Omit<IUser, "password"> = newUser;
+  const { password, ...cleanUser } = newUser.toObject();
+  const user: Omit<IUser, "password"> = cleanUser;
   const accessToken = newUser.generateAccessToken();
   const refreshToken = newUser.generateRefreshToken();
 
@@ -54,7 +55,8 @@ export const login = async (data: Pick<IUser, "email" | "password">) => {
     throw error;
   }
 
-  const userData: Omit<IUser, "password"> = user;
+  const { password, ...userClean } = user.toObject();
+  const userData: Omit<IUser, "password"> = userClean;
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
 
@@ -77,7 +79,8 @@ export const refreshToken = async (refreshToken: string) => {
   }
 
   const accessToken = user.generateAccessToken();
-  const data: Omit<IUser, "password"> = user;
+  const { password, ...userClean } = user.toObject();
+  const data: Omit<IUser, "password"> = userClean;
   return {
     message: "Access token generated successfully",
     data: { user: data, accessToken },
@@ -98,7 +101,10 @@ export const getProfile = async (userId: string) => {
   };
 };
 
-export const updateProfile = async (userId: string, data: Partial<Pick<IUser, "name" | "email" | "phone">>) => {
+export const updateProfile = async (
+  userId: string,
+  data: { name?: IUser["name"] | undefined; email?: IUser["email"] | undefined; phone?: IUser["phone"] | undefined },
+) => {
   const user = await User.findById(userId);
   if (!user) {
     const error: CustomError = new Error("User not found");
@@ -127,7 +133,7 @@ export const getPortfolio = async (userId: string) => {
     throw error;
   }
 
-  if (user.role !== userRoles.values.CHEF) {
+  if (user.role !== EUserRole.CHEF) {
     const error: CustomError = new Error("User is not a chef");
     error.statusCode = 400;
     throw error;
@@ -182,7 +188,7 @@ export const getPortfolio = async (userId: string) => {
       },
     },
   ]);
-  const userData: Pick<IUser, "name" | "role" | "bio" | "socials" | "phone" | "avatar" | "banner"> = user;
+  const userData: Pick<IUser, "name" | "role" | "bio" | "socials" | "phone" | "avatar" | "banner"> = user.toObject();
   return {
     success: true,
     message: "Loaded profile successfully",
@@ -190,7 +196,11 @@ export const getPortfolio = async (userId: string) => {
   };
 };
 
-export const updatePortfolio = async (userId: string, data: Partial<Pick<IUser, "bio" | "socials">>, fileBuffer?: Buffer) => {
+export const updatePortfolio = async (
+  userId: string,
+  data: { bio?: IUser["bio"] | undefined; socials?: IUser["socials"] | undefined },
+  fileBuffer?: Buffer,
+) => {
   const user = await User.findById(userId);
   if (!user) {
     const error: CustomError = new Error("User not found");
@@ -198,7 +208,11 @@ export const updatePortfolio = async (userId: string, data: Partial<Pick<IUser, 
     throw error;
   }
 
-  const filteredData: Partial<Pick<IUser, "bio" | "socials" | "banner">> = data;
+  const filteredData: {
+    bio?: IUser["bio"] | undefined;
+    socials?: IUser["socials"] | undefined;
+    banner?: IUser["banner"] | undefined;
+  } = data;
 
   if (fileBuffer) {
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
@@ -236,7 +250,6 @@ export const updatePortfolio = async (userId: string, data: Partial<Pick<IUser, 
 
   const userData: Omit<IUser, "password"> = updated;
   return {
-    success: true,
     message: "Portfolio updated successfully",
     data: {
       updated: userData,

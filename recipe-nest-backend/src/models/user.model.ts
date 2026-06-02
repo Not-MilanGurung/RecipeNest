@@ -10,17 +10,6 @@ import {
   parseExpiresInToMilliSeconds,
 } from "../configs/config.js";
 
-export const userRoles = Object.freeze({
-  values: {
-    FOODIE: "foodie",
-    CHEF: "chef",
-    ADMIN: "admin",
-  },
-
-  isValid(value: string) {
-    return Object.values(this.values).includes(value);
-  },
-});
 
 export enum EUserRole {
   FOODIE = "foodie",
