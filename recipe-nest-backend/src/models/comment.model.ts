@@ -1,6 +1,15 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const commentSchema = new mongoose.Schema(
+export interface IComment {
+  _id: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  recipe: mongoose.Types.ObjectId;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+const commentSchema = new mongoose.Schema<IComment>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -26,4 +35,4 @@ const commentSchema = new mongoose.Schema(
 );
 
 const Comment = mongoose.model("Comment", commentSchema);
-module.exports = Comment;
+export default Comment;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEventHandler } from "react";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import api from "../helpers/api";
 import CommentItem, { type Comment } from "./CommentItem";
@@ -47,7 +47,7 @@ export default function CommentSection({
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["comments", recipeId] }),
   });
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit : FormEventHandler = (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
     createMutation.mutate(commentText);

@@ -1,8 +1,9 @@
-const Comment = require("../models/comment.model");
-const Recipe = require("../models/recipe.model");
-const { userRoles } = require("../models/user.model");
+import Comment from "../models/comment.model.js";
+import Recipe from "../models/recipe.model.js";
+import { EUserRole } from "../models/user.model.js";
+import { type CustomError } from "../middlewares/error-handler.middleware.js";
 
-const getCommentsByRecipeId = async (recipeId) => {
+export const getCommentsByRecipeId = async (recipeId : string) => {
   const comments = await Comment.find({ recipe: recipeId }).populate(
     "user",
     "name avatar",
@@ -15,10 +16,10 @@ const getCommentsByRecipeId = async (recipeId) => {
   };
 };
 
-const createCommentByRecipeId = async (userId, recipeId, content) => {
+export const createCommentByRecipeId = async (userId : string, recipeId : string, content : string) => {
   const recipe = await Recipe.findById(recipeId);
   if (!recipe) {
-    const error = new Error("Recipe not found");
+    const error : CustomError = new Error("Recipe not found");
     error.statusCode = 404;
     throw error;
   }
@@ -38,16 +39,16 @@ const createCommentByRecipeId = async (userId, recipeId, content) => {
   };
 };
 
-const updateCommentById = async (userId, commentId, content) => {
+export const updateCommentById = async (userId : string, commentId : string, content : string) => {
   const comment = await Comment.findById(commentId);
   if (!comment) {
-    const error = new Error("Comment not found");
+    const error : CustomError = new Error("Comment not found");
     error.statusCode = 404;
     throw error;
   }
 
   if (!comment.user.equals(userId)) {
-    const error = new Error("Unauthorized to update this comment");
+    const error : CustomError = new Error("Unauthorized to update this comment");
     error.statusCode = 403;
     throw error;
   }
@@ -63,16 +64,16 @@ const updateCommentById = async (userId, commentId, content) => {
   };
 };
 
-const deleteCommentById = async (userId, userRole, commentId) => {
+export const deleteCommentById = async (userId : string, userRole : string, commentId : string) => {
   const comment = await Comment.findById(commentId);
   if (!comment) {
-    const error = new Error("Comment not found");
+    const error : CustomError = new Error("Comment not found");
     error.statusCode = 404;
     throw error;
   }
 
-  if (!comment.user.equals(userId) && userRole !== userRoles.ADMIN) {
-    const error = new Error("Unauthorized to delete this comment");
+  if (!comment.user.equals(userId) && userRole !== EUserRole.ADMIN) {
+    const error : CustomError = new Error("Unauthorized to delete this comment");
     error.statusCode = 403;
     throw error;
   }
@@ -85,9 +86,4 @@ const deleteCommentById = async (userId, userRole, commentId) => {
   };
 };
 
-module.exports = {
-  getCommentsByRecipeId,
-  createCommentByRecipeId,
-  updateCommentById,
-  deleteCommentById,
-};
+

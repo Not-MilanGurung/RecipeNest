@@ -1,10 +1,11 @@
-const Rating = require("../models/rating.model");
-const Recipe = require("../models/recipe.model");
+import Rating from "../models/rating.model.js";
+import Recipe from "../models/recipe.model.js";
+import type { CustomError } from "../middlewares/error-handler.middleware.js";
 
-const getRating = async (userId, recipeId) => {
+export const getRating = async (userId: string, recipeId: string) => {
   const rating = await Rating.findOne({ user: userId, recipe: recipeId });
   if (!rating) {
-    const error = new Error("Rating not found");
+    const error : CustomError = new Error("Rating not found");
     error.statusCode = 404;
     throw error;
   }
@@ -16,16 +17,16 @@ const getRating = async (userId, recipeId) => {
   };
 };
 
-const createRatingOrUpdate = async (userId, recipeId, ratingValue) => {
+export const createRatingOrUpdate = async (userId: string, recipeId: string, ratingValue: number) => {
   const recipe = await Recipe.findById(recipeId);
   if (!recipe) {
-    const error = new Error("Recipe not found");
+    const error : CustomError = new Error("Recipe not found");
     error.statusCode = 404;
     throw error;
   }
 
   if (ratingValue < 1 || ratingValue > 5) {
-    const error = new Error(
+    const error : CustomError = new Error(
       "Invalid rating value. Please provide a rating between 1 and 5.",
     );
     error.statusCode = 400;
@@ -62,7 +63,3 @@ const createRatingOrUpdate = async (userId, recipeId, ratingValue) => {
   };
 };
 
-module.exports = {
-  getRating,
-  createRatingOrUpdate,
-};

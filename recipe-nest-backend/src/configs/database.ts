@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { DB_URL } = require("./config");
+import mongoose from "mongoose";
+import { DB_URL } from './config.js';
 
 mongoose.connect(DB_URL, { dbName: "recipe-nest" });
 
@@ -10,4 +10,4 @@ database.once("open", () => {
   console.log("Database connected");
 });
 
-module.exports = database;
+export default database;
